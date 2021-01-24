@@ -113,7 +113,7 @@ namespace wowwowwow
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"```{ex.Message}``` \n\nEnsure that keywords and values are quoted like \"this\""));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"```{ex.Message}```\nEnsure that keywords and values are quoted like \"this\""));
             }
         }
 
