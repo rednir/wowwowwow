@@ -35,7 +35,7 @@ namespace wowwowwow
 
         public async Task Echo(string command)
         {
-            await verboseManager.sendEmbedMessage(embedMessage.Info(command));
+            await verboseManager.sendEmbedMessage(embedMessage.Log(command));
         }
 
         public async Task Add(List<string> parameters)
@@ -80,6 +80,12 @@ namespace wowwowwow
                 sb.Append("\n" + keyword);
             }
             await verboseManager.sendEmbedMessage(embedMessage.Info(sb.ToString()));
+        }
+
+        public async Task Pause(int minutes)
+        {
+            await verboseManager.sendEmbedMessage(embedMessage.Info($"Bot has been paused for {minutes} minutes"));
+            await Task.Delay(minutes * 60000);
         }
 
     }

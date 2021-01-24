@@ -21,11 +21,11 @@ namespace wowwowwow
         {
             "All user commands:\n",
             "!wow reload",
-            "!wow echo",
             "!wow list",
             "!wow add \"<keyword>\" \"<value>\"",
             "!wow remove \"<keyword>\"",
-            "!wow edit \"<keyword>\" \"<value>\""
+            "!wow edit \"<keyword>\" \"<value>\"",
+            "!wow pause <minutes>"
         });
 
         public static Dictionary<string, string> keywords = new Dictionary<string, string>();
@@ -74,7 +74,7 @@ namespace wowwowwow
                 switch (commandSplit[1])
                 {
                     case "help":
-                        await userCommands.Help();
+                        await userCommands.Help(true);
                         break;
 
                     case "reload":
@@ -100,16 +100,20 @@ namespace wowwowwow
                     case "list":
                         await userCommands.List();
                         break;
+                    
+                    case "pause":
+                        await userCommands.Pause(Convert.ToInt32(commandSplit[2]));
+                        break;
 
                     default:
-                        await userCommands.Help(true);
+                        await userCommands.Help();
                         break;
                 }
                 
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"{ex.Message}\n\nEnsure keywords and values should be quoted like \"this\""));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"```{ex.Message}``` \n\nEnsure that keywords and values are quoted like \"this\""));
             }
         }
 

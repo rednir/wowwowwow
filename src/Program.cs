@@ -18,6 +18,8 @@ namespace wowwowwow
         public const long botAccountID = 802277381129764865;
 
         private CommandManager commandManager = new CommandManager();
+        private VerboseManager verboseManager = new VerboseManager();
+        private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
 
         public const LogSeverity logLevel = LogSeverity.Debug;
 
@@ -57,55 +59,69 @@ namespace wowwowwow
                 await commandManager.Execute(recievedMessage.Content);
                 return;
             }
-            var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
-            if (foundKeywords != null)
-            {
-                Console.WriteLine(foundKeywords);
-                await lastChannel.SendMessageAsync(CommandManager.keywords[foundKeywords]);
-            }
 
+            // only carry on if message is not command
+            var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
+            try
+            {
+                if (CommandManager.keywords[foundKeywords].StartsWith("http"))
+                {
+                    await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(CommandManager.keywords[foundKeywords], true));
+                    return;
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                Console.WriteLine(recievedMessage);
+                return;
+            }
+            Console.WriteLine(foundKeywords);
+            await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(CommandManager.keywords[foundKeywords]));
         }
 
 
-        private dynamic CheckStringForKeyword(string s)
-        {
-            List<string> listOfKeywords = new List<string>();
-            string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
+    
 
-            foreach (var k in CommandManager.keywords.Keys)
+
+    private dynamic CheckStringForKeyword(string s)
+    {
+        List<string> listOfKeywords = new List<string>();
+        string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
+
+        foreach (var k in CommandManager.keywords.Keys)
+        {
+            string keyword = k.ToLower();
+            if (stringToSearch.Contains(keyword, StringComparison.OrdinalIgnoreCase))
             {
-                string keyword = k.ToLower();
-                if (stringToSearch.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                // prioritize exact matches
+                if (keyword == stringToSearch)
                 {
-                    // prioritize exact matches
-                    if (keyword == stringToSearch)
+                    listOfKeywords.Add(keyword);
+                    listOfKeywords.RemoveAll((x) => x != keyword);
+                    break;
+                }
+                else if (stringToSearch.Contains(keyword))
+                {
+                    // check if the keyword is not part of another word (check if whitespace in front and behind)
+                    try
                     {
-                        listOfKeywords.Add(keyword);
-                        listOfKeywords.RemoveAll((x) => x != keyword);
-                        break;
-                    }
-                    else if (stringToSearch.Contains(keyword))
-                    {
-                        // check if the keyword is not part of another word (check if whitespace in front and behind)
-                        try
-                        {
-                            if (stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length] == ' ' && stringToSearch[stringToSearch.IndexOf(keyword) - 1] == ' ')
-                            {
-                                listOfKeywords.Add(keyword);
-                            }
-                        }
-                        catch (IndexOutOfRangeException)
+                        if (stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length] == ' ' && stringToSearch[stringToSearch.IndexOf(keyword) - 1] == ' ')
                         {
                             listOfKeywords.Add(keyword);
                         }
                     }
+                    catch (IndexOutOfRangeException)
+                    {
+                        listOfKeywords.Add(keyword);
+                    }
                 }
             }
-
-            return listOfKeywords.Max();
-
         }
 
+        return listOfKeywords.Max();
 
     }
+
+
+}
 }
