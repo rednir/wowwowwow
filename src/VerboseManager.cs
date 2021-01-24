@@ -34,11 +34,14 @@ namespace wowwowwow
             {
                 return new EmbedMessage() {title = "Error", description = toBeDescription, color = Color.Red};
             }
+            public EmbedMessage Warning(string toBeDescription)
+            {
+                return new EmbedMessage() {title = "Warning", description = toBeDescription, color = Color.Orange};
+            }
             public EmbedMessage Info(string toBeDescription)
             {
                 return new EmbedMessage() {title = "Info", description = toBeDescription, color = Color.Blue};
             }
-
             public EmbedMessage Log(string toBeDescription)
             {
                 return new EmbedMessage() {title = "", description = toBeDescription, color = Color.DarkGrey};
