@@ -19,7 +19,7 @@ namespace wowwowwow
 
         private CommandManager commandManager = new CommandManager();
 
-        private const LogSeverity logLevel = LogSeverity.Debug;
+        public const LogSeverity logLevel = LogSeverity.Debug;
 
         public static IMessageChannel lastChannel;
         public static void Main(string[] args)
@@ -27,14 +27,6 @@ namespace wowwowwow
             new Program().MainAsync().GetAwaiter().GetResult();
         }
 
-        public static async Task Log(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-            if (msg.Severity <= logLevel)
-            {
-                await lastChannel.SendMessageAsync($"**[{msg.Source}: {msg.Severity}]** {msg.Message}");
-            }
-        }
 
         private async Task MainAsync()
         {
@@ -42,7 +34,7 @@ namespace wowwowwow
             var token = File.ReadAllText("token.txt");
             _client = new DiscordSocketClient();
 
-            _client.Log += Log;
+            _client.Log += commandManager.Log;
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
@@ -55,7 +47,7 @@ namespace wowwowwow
 
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {
-            if (recievedMessage.Author.Id == botAccountID || recievedMessage.Author.Id == 403660420646436864) // :wetincan
+            if (recievedMessage.Author.Id == botAccountID) // tincan
             {
                 return;
             }

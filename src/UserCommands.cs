@@ -14,58 +14,62 @@ namespace wowwowwow
     {
         static private CommandManager commandManager = new CommandManager();
 
+        private VerboseManager verboseManager = new VerboseManager();
+
+        private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
+
         public async Task Help(bool fromHelpCommand = false)
         {
             if (fromHelpCommand == false)
             {
-                await Program.Log(new LogMessage(LogSeverity.Error, "Program", "no such command"));
+                await verboseManager.sendEmbedMessage(embedMessage.Error("No such command"));
             }
-            await Program.Log(new LogMessage(LogSeverity.Info, "Program", commandManager.helpText));
+            await verboseManager.sendEmbedMessage(embedMessage.Info(commandManager.helpText));
         }
 
         public async Task Reload()
         {
             await commandManager.LoadKeywords();
-            await Program.Log(new LogMessage(LogSeverity.Info, "Program", "reloaded keywords"));
+            await verboseManager.sendEmbedMessage(embedMessage.Info("{ } keywords were reloaded"));
         }
 
         public async Task Echo(string command)
         {
-            await Program.Log(new LogMessage(LogSeverity.Info, "Program", command));
+            await verboseManager.sendEmbedMessage(embedMessage.Info(command));
         }
 
         public async Task Add(List<string> parameters)
         {
-            await Program.Log(new LogMessage(LogSeverity.Debug, "Program", $"{parameters[0]}"));
+            //await verboseManager.sendEmbedMessage(new LogMessage(LogSeverity.Debug, "Program", $"{parameters[0]}"));
 
             CommandManager.keywords.Add(parameters[0], parameters[1]);
             await commandManager.SaveKeywords();
-            await Program.Log(new LogMessage(LogSeverity.Info, "Program", "added new keyword"));
+            await verboseManager.sendEmbedMessage(embedMessage.Info($"{parameters[0]} was added as a keyword"));
         }
 
         public async Task Remove(List<string> parameters)
         {
             if (!CommandManager.keywords.ContainsKey(parameters[0]))
             {
-                await Program.Log(new LogMessage(LogSeverity.Error, "Program", "no such keyword"));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
                 return;
             }
             CommandManager.keywords.Remove(parameters[0]);
             await commandManager.SaveKeywords();
-            await Program.Log(new LogMessage(LogSeverity.Info, "Program", "removed keyword"));
+            await verboseManager.sendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was removed"));
         }
 
         public async Task Edit(List<string> parameters)
         {
             if (!CommandManager.keywords.ContainsKey(parameters[0]))
             {
-                await Program.Log(new LogMessage(LogSeverity.Error, "Program", "no such keyword"));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
                 return;
             }
             CommandManager.keywords.Remove(parameters[0]);
             CommandManager.keywords.Add(parameters[0], parameters[1]);
             await commandManager.SaveKeywords();
-            await Program.Log(new LogMessage(LogSeverity.Info, "Program", "edited keyword"));
+            await verboseManager.sendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was edited"));
         }
 
         public async Task List()
@@ -75,7 +79,7 @@ namespace wowwowwow
             {
                 sb.Append("\n" + keyword);
             }
-            await Program.Log(new LogMessage(LogSeverity.Info, "Program", sb.ToString()));
+            await verboseManager.sendEmbedMessage(embedMessage.Info(sb.ToString()));
         }
 
     }

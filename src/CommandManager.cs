@@ -12,12 +12,14 @@ namespace wowwowwow
     public class CommandManager
     {
         private UserCommands userCommands = new UserCommands();
+        private VerboseManager verboseManager = new VerboseManager();
+        private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
         public const string commandIdentifier = "!wow";
 
         public string helpText = string.Join(Environment.NewLine,
         new string[]
         {
-            "commands:\n",
+            "All user commands:\n",
             "!wow reload",
             "!wow echo",
             "!wow list",
@@ -28,10 +30,20 @@ namespace wowwowwow
 
         public static Dictionary<string, string> keywords = new Dictionary<string, string>();
 
+        public async Task Log(LogMessage msg)
+        {
+            Console.WriteLine(msg.ToString());
+            if (msg.Severity <= Program.logLevel)
+            {
+                await verboseManager.sendEmbedMessage(embedMessage.Log($"**[{msg.Source}: {msg.Severity}]** {msg.Message}"));
+            }
+        }
+
         public async Task LoadKeywords()
         {
             await Task.Run(() => keywords = JsonSerializer.Deserialize<Dictionary<String, String>>(File.ReadAllText("keywords.json")));
         }
+
         public async Task SaveKeywords()
         {
             await File.WriteAllTextAsync("keywords.json", JsonSerializer.Serialize(keywords));
@@ -97,7 +109,7 @@ namespace wowwowwow
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                await Program.Log(new LogMessage(LogSeverity.Error, "Program", $"{ex}\nKeywords and values should be quoted like \"this\""));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"{ex.Message}\n\nEnsure keywords and values should be quoted like \"this\""));
             }
         }
 
