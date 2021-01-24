@@ -75,15 +75,29 @@ namespace wowwowwow
         public async Task List()
         {
             StringBuilder sb = new StringBuilder();
+            sb.Append("**List of keywords:**");
             foreach (var keyword in CommandManager.keywords.Keys)
             {
-                sb.Append("\n" + keyword);
+                if (keyword.StartsWith("@"))
+                {
+                    sb.Append($"\n - @ {keyword.Substring(1)}");
+                }
+                else
+                {
+                    sb.Append("\n - " + keyword);
+                }
+                
             }
             await verboseManager.sendEmbedMessage(embedMessage.Info(sb.ToString()));
         }
 
         public async Task Pause(double minutes)
         {
+            if (minutes > 999 || minutes <= 0)
+            {
+                await verboseManager.sendEmbedMessage(embedMessage.Error("The number of minutes specified was either too big or too small"));
+                return;
+            }
             Program.isBotPaused = true;
             await verboseManager.sendEmbedMessage(embedMessage.Info($"Bot has been paused for {minutes} minutes"));
             await Task.Delay(Convert.ToInt32(minutes * 60000.0));
