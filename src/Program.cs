@@ -47,7 +47,7 @@ namespace wowwowwow
 
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {
-            if (recievedMessage.Author.Id == botAccountID) // tincan
+            if (recievedMessage.Author.Id == botAccountID)
             {
                 return;
             }

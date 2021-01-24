@@ -20,6 +20,8 @@ namespace wowwowwow
             embed.WithTitle(message.title);
             embed.WithDescription(message.description);
             embed.WithColor(message.color);
+
+            Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"sendEmbedMessage ({message.title}: {message.description})").ToString());
             await Program.lastChannel.SendMessageAsync($"", false, embed.Build());
         }
 
