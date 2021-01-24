@@ -19,7 +19,7 @@ namespace wowwowwow
 
         private CommandManager commandManager = new CommandManager();
 
-        private const LogSeverity logLevel = LogSeverity.Info;
+        private const LogSeverity logLevel = LogSeverity.Debug;
 
         public static IMessageChannel lastChannel;
         public static void Main(string[] args)
@@ -55,7 +55,7 @@ namespace wowwowwow
 
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {
-            if (recievedMessage.Author.Id == botAccountID)
+            if (recievedMessage.Author.Id == botAccountID || recievedMessage.Author.Id == 403660420646436864) // :wetincan
             {
                 return;
             }

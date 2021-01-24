@@ -36,6 +36,8 @@ namespace wowwowwow
 
         public async Task Add(List<string> parameters)
         {
+            await Program.Log(new LogMessage(LogSeverity.Debug, "Program", $"{parameters[0]}"));
+
             CommandManager.keywords.Add(parameters[0], parameters[1]);
             await commandManager.SaveKeywords();
             await Program.Log(new LogMessage(LogSeverity.Info, "Program", "added new keyword"));

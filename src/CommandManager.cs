@@ -46,10 +46,10 @@ namespace wowwowwow
                 return;
             }
 
-            command = Regex.Replace(command, @"\t|\n|\r", " ");
+            //command = Regex.Replace(command, @"\t|\n|\r", "\n");
 
             // add all text in quotes to a list
-            Regex regex = new Regex("\"(.*?)\"");
+            Regex regex = new Regex("\"(.*?)\"", RegexOptions.Singleline);
             var matches = regex.Matches(command);
             List<String> parameters = new List<string>();
             foreach (Match match in matches)
@@ -97,7 +97,7 @@ namespace wowwowwow
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                await Program.Log(new LogMessage(LogSeverity.Error, "Program", $"{ex.Message}\nKeywords and values should be quoted like \"this\""));
+                await Program.Log(new LogMessage(LogSeverity.Error, "Program", $"{ex}\nKeywords and values should be quoted like \"this\""));
             }
         }
 
