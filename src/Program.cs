@@ -17,13 +17,17 @@ namespace wowwowwow
 
         public const long botAccountID = 802277381129764865;
 
+        public static bool isBotPaused = false;
+
         private CommandManager commandManager = new CommandManager();
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
 
         public const LogSeverity logLevel = LogSeverity.Debug;
 
-        public static IMessageChannel lastChannel;
+        public static ISocketMessageChannel lastChannel;
+
+
         public static void Main(string[] args)
         {
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -49,7 +53,7 @@ namespace wowwowwow
 
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {
-            if (recievedMessage.Author.Id == botAccountID)
+            if (isBotPaused || recievedMessage.Author.Id == botAccountID)
             {
                 return;
             }

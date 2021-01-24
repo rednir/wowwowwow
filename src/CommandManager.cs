@@ -102,7 +102,7 @@ namespace wowwowwow
                         break;
                     
                     case "pause":
-                        await userCommands.Pause(Convert.ToInt32(commandSplit[2]));
+                        await userCommands.Pause(Convert.ToDouble(commandSplit[2]));
                         break;
 
                     default:

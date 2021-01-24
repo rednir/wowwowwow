@@ -82,10 +82,12 @@ namespace wowwowwow
             await verboseManager.sendEmbedMessage(embedMessage.Info(sb.ToString()));
         }
 
-        public async Task Pause(int minutes)
+        public async Task Pause(double minutes)
         {
+            Program.isBotPaused = true;
             await verboseManager.sendEmbedMessage(embedMessage.Info($"Bot has been paused for {minutes} minutes"));
-            await Task.Delay(minutes * 60000);
+            await Task.Delay(Convert.ToInt32(minutes * 60000.0));
+            Program.isBotPaused = false;
         }
 
     }
