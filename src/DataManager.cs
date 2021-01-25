@@ -12,21 +12,34 @@ namespace wowwowwow
 {
     public class DataManager
     {
-        public const string keywordsFile = "keywords.json";
-        public const string configFile = "config.json";
+        public const string keywordsFileName = "keywords.json";
+        public const string configFileName = "config.json";
         public static Dictionary<string, string> keywords = new Dictionary<string, string>();
         public static Dictionary<string, dynamic> config = new Dictionary<string, dynamic>();
 
         public async Task LoadData()
         {
-            await Task.Run(() => keywords = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(keywordsFile)));
-            await Task.Run(() => config = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(File.ReadAllText(configFile)));
+            await Task.Run(() => keywords = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(keywordsFileName)));
+            await Task.Run(() => config = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(File.ReadAllText(configFileName)));
+
+            config["ignore"] = JsonElementToList<ulong>(config["ignore"]);
         }
 
         public async Task SaveData()
         {
-            await File.WriteAllTextAsync(keywordsFile, JsonSerializer.Serialize(keywords));
-            await File.WriteAllTextAsync(configFile, JsonSerializer.Serialize(config));
+            await File.WriteAllTextAsync(keywordsFileName, JsonSerializer.Serialize(keywords));
+            await File.WriteAllTextAsync(configFileName, JsonSerializer.Serialize(config));
+        }
+
+        public List<T> JsonElementToList<T>(JsonElement element)
+        {
+            return JsonSerializer.Deserialize<List<T>>(element.GetRawText());
+        }
+
+        public async Task SyncData()
+        {
+            await SaveData();
+            await LoadData();
         }
 
     }

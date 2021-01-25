@@ -15,8 +15,8 @@ namespace wowwowwow
 
         private class Command
         {
-            public string fullCommand { get; set; }
-            public string[] splitCommand { get; set; }
+            public SocketMessage message { get; set; }
+            public string[] split { get; set; }
             public List<string> parameters { get; set; }
         }
 
@@ -63,24 +63,27 @@ namespace wowwowwow
             }
         }
 
-        public async Task Execute(string command)
+        public async Task Execute(SocketMessage command)
         {
+            // remove extra whitespace
+            Regex regex = new Regex("\\s+");
+
             currentCommand = new Command()
             {
-                fullCommand = command,
-                splitCommand = command.Split(" "),
+                message = command,
+                split = regex.Replace(command.Content, " ").Split(" "),
                 parameters = new List<string>()
             };
 
-            if (currentCommand.splitCommand.Length <= 1)
+            if (currentCommand.split.Length <= 1)
             {
                 await mainCommands.Help();
                 return;
             }
 
             // add all text in quotes to list
-            Regex regex = new Regex("\"(.*?)\"", RegexOptions.Singleline);
-            var matches = regex.Matches(command);
+            regex = new Regex("\"(.*?)\"", RegexOptions.Singleline);
+            var matches = regex.Matches(command.Content);
             foreach (Match match in matches)
             {
                 currentCommand.parameters.Add(match.Groups[1].ToString().Trim('\''));
@@ -88,7 +91,7 @@ namespace wowwowwow
 
             try
             {
-                switch (currentCommand.splitCommand[1])
+                switch (currentCommand.split[1])
                 {
                     case "keyword":
                         await ExecuteKeyword();
@@ -106,7 +109,6 @@ namespace wowwowwow
             catch (Exception ex)
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex.Message}```"));
-                await mainCommands.Help();
             }
 
 
@@ -115,7 +117,7 @@ namespace wowwowwow
 
         private async Task ExecuteMain()
         {
-            switch (currentCommand.splitCommand[1])
+            switch (currentCommand.split[1])
             {
                 case "help":
                     await mainCommands.Help();
@@ -126,16 +128,15 @@ namespace wowwowwow
                     break;
 
                 case "echo":
-                    await mainCommands.Echo(currentCommand.fullCommand);
+                    await mainCommands.Echo(currentCommand.message.Content);
                     break;
 
                 case "pause":
-                    await mainCommands.Pause(Convert.ToDouble(currentCommand.splitCommand[2]));
+                    await mainCommands.Pause(Convert.ToDouble(currentCommand.split[2]));
                     break;
 
                 default:
                     await verboseManager.SendEmbedMessage(embedMessage.Error($"No such command.{pointerToHelpText}"));
-                    //await mainCommands.Help();
                     break;
             }
         }
@@ -145,7 +146,7 @@ namespace wowwowwow
         {
             try
             {
-                switch (currentCommand.splitCommand[2])
+                switch (currentCommand.split[2])
                 {
                     case "add":
                         await keywordCommands.Add(currentCommand.parameters);
@@ -184,10 +185,10 @@ namespace wowwowwow
         {
             try
             {
-                switch (currentCommand.splitCommand[2])
+                switch (currentCommand.split[2])
                 {
                     case "ignore":
-                        await configCommands.Ignore(currentCommand.splitCommand[3], currentCommand.splitCommand[4]);
+                        await configCommands.Ignore(currentCommand.message.MentionedUsers, currentCommand.split[4]);
                         break;
 
                     case "react_to_delete":

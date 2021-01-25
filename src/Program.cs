@@ -69,7 +69,7 @@ namespace wowwowwow
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {
             Console.WriteLine($"[{recievedMessage.Timestamp}] {recievedMessage.Author}: {recievedMessage.Content}");
-            if (isBotPaused || recievedMessage.Author.Id == botAccountID)
+            if (isBotPaused || DataManager.config["ignore"].Contains(recievedMessage.Author.Id))
             {
                 return;
             }
@@ -81,7 +81,7 @@ namespace wowwowwow
                     await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
                     return;
                 }
-                await commandManager.Execute(recievedMessage.Content);
+                await commandManager.Execute(recievedMessage);
                 return;
             }
 
