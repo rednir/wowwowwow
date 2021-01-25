@@ -39,6 +39,11 @@ namespace wowwowwow
                 embed.WithDescription(message.description);
             }
 
+            if (message.logSeverity != new LogSeverity())
+            {
+                embed.WithTitle($"{message.logSource} {message.logSeverity}");
+            }
+
             if (message.timeUntilDelete > 0)
             {
                 embed.WithFooter($"This message will be deleted in {message.timeUntilDelete / 1000} seconds", "https://icons.iconarchive.com/icons/martz90/circle-addon2/256/warning-icon.png");
@@ -59,6 +64,9 @@ namespace wowwowwow
             public Color color { get; set; }
             public int timeUntilDelete { get; set; }
             public bool isImage { get; set; }
+            public LogSeverity logSeverity { get; set; } = new LogSeverity();
+
+            public string logSource { get; set; }
 
             public EmbedMessage Error(string toBeDescription)
             {
@@ -72,9 +80,9 @@ namespace wowwowwow
             {
                 return new EmbedMessage() { title = "Info", description = toBeDescription, color = Color.Blue };
             }
-            public EmbedMessage Log(string toBeDescription)
+            public EmbedMessage Log(string toBeDescription, LogSeverity toBeLogSeverity, string toBeLogSource)
             {
-                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.DarkGrey, timeUntilDelete = 15000 };
+                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default, timeUntilDelete = 15000, logSeverity = toBeLogSeverity, logSource = toBeLogSource };
             }
             public EmbedMessage KeywordResponse(string toBeDescription, bool toBeImage = false)
             {

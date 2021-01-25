@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.IO;
 using Discord;
 using Discord.WebSocket;
+using wowwowwow.UserCommands;
 
 namespace wowwowwow
 {
@@ -20,7 +21,8 @@ namespace wowwowwow
         }
 
         private Command currentCommand;
-        private UserCommands userCommands = new UserCommands();
+        private UserCommands.Main mainCommands = new UserCommands.Main();
+        private UserCommands.Keyword keywordCommands = new UserCommands.Keyword();
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
         public const string commandIdentifier = "!wow";
@@ -33,6 +35,7 @@ namespace wowwowwow
             " - `!wow help`",
             " - `!wow reload`",
             " - `!wow blacklist <user tag>` todo",
+            " - `!wow echo`",
             " - `!wow pause <minutes>`",
 
             "\nKeyword commands:",
@@ -52,7 +55,7 @@ namespace wowwowwow
             Console.WriteLine(msg.ToString());
             if (msg.Severity <= Program.logLevel)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Log($"**[{msg.Source}: {msg.Severity}]** {msg.Message}"));
+                await verboseManager.sendEmbedMessage(embedMessage.Log($"{msg.Message}", msg.Severity, msg.Source));
             }
         }
 
@@ -77,7 +80,7 @@ namespace wowwowwow
 
             if (currentCommand.splitCommand.Length <= 1)
             {
-                await userCommands.Help();
+                await mainCommands.Help();
                 return;
             }
 
@@ -102,9 +105,10 @@ namespace wowwowwow
                         break;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                await userCommands.Help();
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex.Message}```"));
+                await mainCommands.Help();
             }
 
 
@@ -116,23 +120,24 @@ namespace wowwowwow
             switch (currentCommand.splitCommand[1])
             {
                 case "help":
-                    await userCommands.Help(true);
+                    await mainCommands.Help();
                     break;
 
                 case "reload":
-                    await userCommands.Reload();
+                    await mainCommands.Reload();
                     break;
 
                 case "echo":
-                    await userCommands.Echo(currentCommand.fullCommand);
+                    await mainCommands.Echo(currentCommand.fullCommand);
                     break;
 
                 case "pause":
-                    await userCommands.Pause(Convert.ToDouble(currentCommand.splitCommand[2]));
+                    await mainCommands.Pause(Convert.ToDouble(currentCommand.splitCommand[2]));
                     break;
 
                 default:
-                    await userCommands.Help();
+                    await verboseManager.sendEmbedMessage(embedMessage.Error("No such command"));
+                    await mainCommands.Help();
                     break;
             }
         }
@@ -145,31 +150,38 @@ namespace wowwowwow
                 switch (currentCommand.splitCommand[2])
                 {
                     case "add":
-                        await userCommands.Add(currentCommand.parameters);
+                        await keywordCommands.Add(currentCommand.parameters);
                         break;
 
                     case "remove":
-                        await userCommands.Remove(currentCommand.parameters);
+                        await keywordCommands.Remove(currentCommand.parameters);
                         break;
 
                     case "edit":
-                        await userCommands.Edit(currentCommand.parameters);
+                        await keywordCommands.Edit(currentCommand.parameters);
                         break;
 
                     case "list":
-                        await userCommands.List();
+                        await keywordCommands.List();
                         break;
 
                     default:
-                        await userCommands.Help();
+                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command"));
+                        await mainCommands.Help();
                         break;
 
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentOutOfRangeException ex)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"```{ex.Message}```\nEnsure that keywords and values are quoted like \"this\""));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"Could not execute the command, the following error was returned:```{ex.Message}```Ensure that keywords and values are quoted like \"this\""));
             }
+            catch (IndexOutOfRangeException)
+            {
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option"));
+                await mainCommands.Help();
+            }
+
         }
 
 
