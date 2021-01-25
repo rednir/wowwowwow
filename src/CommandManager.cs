@@ -11,21 +11,37 @@ namespace wowwowwow
 {
     public class CommandManager
     {
+
+        private class Command
+        {
+            public string fullCommand { get; set; }
+            public string[] splitCommand { get; set; }
+            public List<string> parameters { get; set; }
+        }
+
+        private Command currentCommand;
         private UserCommands userCommands = new UserCommands();
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
         public const string commandIdentifier = "!wow";
 
+
         public string helpText = string.Join(Environment.NewLine,
         new string[]
         {
-            "All user commands:\n",
-            "!wow reload",
-            "!wow list",
-            "!wow add \"<keyword>\" \"<value>\"",
-            "!wow remove \"<keyword>\"",
-            "!wow edit \"<keyword>\" \"<value>\"",
-            "!wow pause <minutes>"
+            "Main commands:",
+            " - `!wow help`",
+            " - `!wow reload`",
+            " - `!wow pause <minutes>`",
+
+            "\nKeyword commands:",
+            " - `!wow keyword list`",
+            " - `!wow keyword add \"<keyword>\" \"<value>\"`",
+            " - `!wow keyword remove \"<keyword>\"`",
+            " - `!wow keyword edit \"<keyword>\" \"<value>\"`",
+
+            "\nOther commands:",
+            " - `!`"
         });
 
         public static Dictionary<string, string> keywords = new Dictionary<string, string>();
@@ -51,67 +67,105 @@ namespace wowwowwow
 
         public async Task Execute(string command)
         {
-            string[] commandSplit = command.Split(" ");
-            if (commandSplit.Length <= 1)
+            currentCommand = new Command()
+            {
+                fullCommand = command,
+                splitCommand = command.Split(" "),
+                parameters = new List<string>()
+            };
+
+            if (currentCommand.splitCommand.Length <= 1)
             {
                 await userCommands.Help();
                 return;
             }
 
-            //command = Regex.Replace(command, @"\t|\n|\r", "\n");
-
-            // add all text in quotes to a list
+            // add all text in quotes to list
             Regex regex = new Regex("\"(.*?)\"", RegexOptions.Singleline);
             var matches = regex.Matches(command);
-            List<String> parameters = new List<string>();
             foreach (Match match in matches)
             {
-                parameters.Add(match.Groups[1].ToString().Trim('\''));
+                currentCommand.parameters.Add(match.Groups[1].ToString().Trim('\''));
             }
 
             try
             {
-                switch (commandSplit[1])
+                switch (currentCommand.splitCommand[1])
                 {
-                    case "help":
-                        await userCommands.Help(true);
+                    case "keyword":
+                        await ExecuteKeyword();
                         break;
 
-                    case "reload":
-                        await userCommands.Reload();
+                    default:
+                        await ExecuteMain();
                         break;
+                }
+            }
+            catch
+            {
+                await userCommands.Help();
+            }
 
-                    case "echo":
-                        await userCommands.Echo(command);
-                        break;
 
+        }
+
+
+        private async Task ExecuteMain()
+        {
+            switch (currentCommand.splitCommand[1])
+            {
+                case "help":
+                    await userCommands.Help(true);
+                    break;
+
+                case "reload":
+                    await userCommands.Reload();
+                    break;
+
+                case "echo":
+                    await userCommands.Echo(currentCommand.fullCommand);
+                    break;
+
+                case "pause":
+                    await userCommands.Pause(Convert.ToDouble(currentCommand.splitCommand[2]));
+                    break;
+
+                default:
+                    await userCommands.Help();
+                    break;
+            }
+        }
+
+
+        private async Task ExecuteKeyword()
+        {
+            try
+            {
+                switch (currentCommand.splitCommand[2])
+                {
                     case "add":
-                        await userCommands.Add(parameters);
+                        await userCommands.Add(currentCommand.parameters);
                         break;
 
                     case "remove":
-                        await userCommands.Remove(parameters);
+                        await userCommands.Remove(currentCommand.parameters);
                         break;
 
                     case "edit":
-                        await userCommands.Edit(parameters);
+                        await userCommands.Edit(currentCommand.parameters);
                         break;
-                    
+
                     case "list":
                         await userCommands.List();
-                        break;
-                    
-                    case "pause":
-                        await userCommands.Pause(Convert.ToDouble(commandSplit[2]));
                         break;
 
                     default:
                         await userCommands.Help();
                         break;
+
                 }
-                
             }
-            catch (ArgumentOutOfRangeException ex)
+            catch (Exception ex)
             {
                 await verboseManager.sendEmbedMessage(embedMessage.Error($"```{ex.Message}```\nEnsure that keywords and values are quoted like \"this\""));
             }

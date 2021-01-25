@@ -30,7 +30,7 @@ namespace wowwowwow
         public async Task Reload()
         {
             await commandManager.LoadKeywords();
-            await verboseManager.sendEmbedMessage(embedMessage.Info("{ } keywords were reloaded"));
+            await verboseManager.sendEmbedMessage(embedMessage.Info($"{CommandManager.keywords.Count} keywords were reloaded"));
         }
 
         public async Task Echo(string command)
