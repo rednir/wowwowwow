@@ -20,6 +20,7 @@ namespace wowwowwow
             embed.WithTitle(message.title);
             embed.WithColor(message.color);
 
+
             if (message.isImage)
             {
                 // add image and remove url text (first word)
@@ -38,12 +39,19 @@ namespace wowwowwow
             {
                 embed.WithDescription(message.description);
             }
-
             if (message.logSeverity != new LogSeverity())
             {
                 embed.WithTitle($"{message.logSource} {message.logSeverity}");
             }
 
+
+            if (message.isThereDeleteOption)
+            {
+                embed.WithFooter($"Is this message annoying? Click on the {new Emoji(Program.deleteReactionText)} to delete it!");
+                var messageWithDeleteOption = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
+                await messageWithDeleteOption.AddReactionAsync(new Emoji(Program.deleteReactionText));
+                return;
+            }
             if (message.timeUntilDelete > 0)
             {
                 embed.WithFooter($"This message will be deleted in {message.timeUntilDelete / 1000} seconds", "https://icons.iconarchive.com/icons/martz90/circle-addon2/256/warning-icon.png");
@@ -51,6 +59,7 @@ namespace wowwowwow
                 _ = Task.Delay(message.timeUntilDelete).ContinueWith((t) => messageToDelete.DeleteAsync());
                 return;
             }
+
 
             Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"sendEmbedMessage ({message.title}: {message.description})").ToString());
             await Program.lastChannel.SendMessageAsync("", false, embed.Build());
@@ -62,6 +71,7 @@ namespace wowwowwow
             public string title { get; set; }
             public string description { get; set; }
             public Color color { get; set; }
+            public bool isThereDeleteOption { get; set; }
             public int timeUntilDelete { get; set; }
             public bool isImage { get; set; }
             public LogSeverity logSeverity { get; set; } = new LogSeverity();
@@ -86,7 +96,7 @@ namespace wowwowwow
             }
             public EmbedMessage KeywordResponse(string toBeDescription, bool toBeImage = false)
             {
-                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = toBeImage };
+                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = toBeImage, isThereDeleteOption = true };
             }
 
 

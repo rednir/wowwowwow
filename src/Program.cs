@@ -17,6 +17,8 @@ namespace wowwowwow
 
         public const long botAccountID = 802277381129764865;
 
+        public const string deleteReactionText = "\uD83D\uDDD1\uFE0F";
+
         public static bool isBotPaused = false;
 
         private CommandManager commandManager = new CommandManager();
@@ -46,8 +48,20 @@ namespace wowwowwow
 
             await commandManager.LoadKeywords();
             _client.MessageReceived += MessageRecieved;
+            _client.ReactionAdded += ReactionAdded;
 
             await Task.Delay(-1);
+        }
+
+
+        private async Task ReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            //verboseManager.sendEmbedMessage(embedMessage.Info(reaction.Emote.Name.ToString()));
+            var message = await cachedMessage.GetOrDownloadAsync();
+            if (message.Author.Id == botAccountID && reaction.UserId != botAccountID && reaction.Emote.Name == deleteReactionText)
+            {
+                await message.DeleteAsync();
+            }
         }
 
 
