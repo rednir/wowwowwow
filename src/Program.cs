@@ -84,48 +84,48 @@ namespace wowwowwow
         }
 
 
-    
 
 
-    private dynamic CheckStringForKeyword(string s)
-    {
-        List<string> listOfKeywords = new List<string>();
-        string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
 
-        foreach (var k in CommandManager.keywords.Keys)
+        private dynamic CheckStringForKeyword(string s)
         {
-            string keyword = k.ToLower();
-            if (stringToSearch.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+            List<string> listOfKeywords = new List<string>();
+            string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
+
+            foreach (var k in CommandManager.keywords.Keys)
             {
-                // prioritize exact matches
-                if (keyword == stringToSearch)
+                string keyword = k.ToLower();
+                if (stringToSearch.Contains(keyword, StringComparison.OrdinalIgnoreCase))
                 {
-                    listOfKeywords.Add(keyword);
-                    listOfKeywords.RemoveAll((x) => x != keyword);
-                    break;
-                }
-                else if (stringToSearch.Contains(keyword))
-                {
-                    // check if the keyword is not part of another word (check if whitespace in front and behind)
-                    try
+                    // prioritize exact matches
+                    if (keyword == stringToSearch)
                     {
-                        if (stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length] == ' ' && stringToSearch[stringToSearch.IndexOf(keyword) - 1] == ' ')
+                        listOfKeywords.Add(keyword);
+                        listOfKeywords.RemoveAll((x) => x != keyword);
+                        break;
+                    }
+                    else if (stringToSearch.Contains(keyword))
+                    {
+                        // check if the keyword is not part of another word (check if whitespace in front and behind)
+                        try
+                        {
+                            if (stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length] == ' ' && stringToSearch[stringToSearch.IndexOf(keyword) - 1] == ' ')
+                            {
+                                listOfKeywords.Add(keyword);
+                            }
+                        }
+                        catch (IndexOutOfRangeException)
                         {
                             listOfKeywords.Add(keyword);
                         }
                     }
-                    catch (IndexOutOfRangeException)
-                    {
-                        listOfKeywords.Add(keyword);
-                    }
                 }
             }
+
+            return listOfKeywords.Max();
+
         }
 
-        return listOfKeywords.Max();
 
     }
-
-
-}
 }

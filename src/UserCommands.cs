@@ -86,7 +86,7 @@ namespace wowwowwow
                 {
                     sb.Append("\n - " + keyword);
                 }
-                
+
             }
             await verboseManager.sendEmbedMessage(embedMessage.Info(sb.ToString()));
         }
