@@ -20,9 +20,12 @@ namespace wowwowwow
             public List<string> parameters { get; set; }
         }
 
-        private Command currentCommand;
+
         private UserCommands.Main mainCommands = new UserCommands.Main();
         private UserCommands.Keyword keywordCommands = new UserCommands.Keyword();
+        private UserCommands.Config configCommands = new UserCommands.Config();
+
+        private Command currentCommand;
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
         public const string commandIdentifier = "!wow";
@@ -34,18 +37,20 @@ namespace wowwowwow
             "Main commands:",
             " - `!wow help`",
             " - `!wow reload`",
-            " - `!wow blacklist <user tag>` todo",
             " - `!wow echo`",
             " - `!wow pause <minutes>`",
 
             "\nKeyword commands:",
             " - `!wow keyword list`",
-            " - `!wow keyword add \"<keyword>\" \"<optional: image>\" \"<value>\"`",
+            " - `!wow keyword add \"<keyword>\" \"<optional:image>\" \"<value>\"`",
             " - `!wow keyword remove \"<keyword>\"`",
-            " - `!wow keyword edit \"<keyword>\" \"<optional: image>\" \"<value>\"`",
+            " - `!wow keyword edit \"<keyword>\" \"<optional:image>\" \"<value>\"`",
 
-            "\nOther commands:",
-            " - `!`"
+            "\nTODO Configuration commands:",
+            " - `!wow config ignore <user> <true/false>`",
+            " - `!wow config react_to_delete <true/false>`",
+            " - `!wow config quiet_mode <true/false>`",
+            " - `!wow config reset`"
         });
 
         public static Dictionary<string, string> keywords = new Dictionary<string, string>();
@@ -100,6 +105,10 @@ namespace wowwowwow
                         await ExecuteKeyword();
                         break;
 
+                    case "config":
+                        await ExecuteConfig();
+                        break;
+
                     default:
                         await ExecuteMain();
                         break;
@@ -136,8 +145,8 @@ namespace wowwowwow
                     break;
 
                 default:
-                    await verboseManager.sendEmbedMessage(embedMessage.Error("No such command"));
-                    await mainCommands.Help();
+                    await verboseManager.sendEmbedMessage(embedMessage.Error("No such command.\nTo see a list of all commands, use `!wow help`"));
+                    //await mainCommands.Help();
                     break;
             }
         }
@@ -166,8 +175,7 @@ namespace wowwowwow
                         break;
 
                     default:
-                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command"));
-                        await mainCommands.Help();
+                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.\nTo see a list of all commands, use `!wow help`"));
                         break;
 
                 }
@@ -178,12 +186,45 @@ namespace wowwowwow
             }
             catch (IndexOutOfRangeException)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option"));
-                await mainCommands.Help();
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"A command was specified with a missing option.\nTo see a list of all commands, use `!wow help`"));
             }
 
         }
 
+        private async Task ExecuteConfig()
+        {
+            try
+            {
+                switch (currentCommand.splitCommand[2])
+                {
+                    case "ignore":
+                        await configCommands.Ignore(currentCommand.splitCommand[3], currentCommand.splitCommand[4]);
+                        break;
+
+                    case "react_to_delete":
+                        await configCommands.ReactToDelete(currentCommand.parameters[3]);
+                        break;
+
+                    case "quiet_mode":
+                        await configCommands.QuietMode(currentCommand.parameters[3]);
+                        break;
+
+                    case "reset":
+                        await configCommands.Reset();
+                        break;
+
+                    default:
+                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.\nTo see a list of all commands, use `!wow help`"));
+                        break;
+
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.To see a list of all commands, use `!wow help`"));
+            }
+
+        }
 
 
     }

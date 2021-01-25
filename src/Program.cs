@@ -79,6 +79,7 @@ namespace wowwowwow
             }
 
             // only carry on if message is not command
+            // todo: make this seperate method
             var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
             try
             {

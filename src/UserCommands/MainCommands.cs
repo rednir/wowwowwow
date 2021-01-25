@@ -1,12 +1,6 @@
 using System;
-using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Text.Json;
-using System.IO;
 using Discord;
-using Discord.WebSocket;
 
 namespace wowwowwow.UserCommands
 {
