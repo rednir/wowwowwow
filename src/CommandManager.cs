@@ -29,6 +29,7 @@ namespace wowwowwow
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
         public const string commandIdentifier = "!wow";
+        public const string pointerToHelpText = "\nTo view a list of commands, use `!wow help`";
 
 
         public string helpText = string.Join(Environment.NewLine,
@@ -145,7 +146,7 @@ namespace wowwowwow
                     break;
 
                 default:
-                    await verboseManager.sendEmbedMessage(embedMessage.Error("No such command.\nTo see a list of all commands, use `!wow help`"));
+                    await verboseManager.sendEmbedMessage(embedMessage.Error($"No such command.{pointerToHelpText}"));
                     //await mainCommands.Help();
                     break;
             }
@@ -175,7 +176,7 @@ namespace wowwowwow
                         break;
 
                     default:
-                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.\nTo see a list of all commands, use `!wow help`"));
+                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.\n{pointerToHelpText}"));
                         break;
 
                 }
@@ -186,7 +187,7 @@ namespace wowwowwow
             }
             catch (IndexOutOfRangeException)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"A command was specified with a missing option.\nTo see a list of all commands, use `!wow help`"));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"A command was specified with a missing option.{pointerToHelpText}"));
             }
 
         }
@@ -214,14 +215,14 @@ namespace wowwowwow
                         break;
 
                     default:
-                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.\nTo see a list of all commands, use `!wow help`"));
+                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.{pointerToHelpText}"));
                         break;
 
                 }
             }
             catch (IndexOutOfRangeException)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.To see a list of all commands, use `!wow help`"));
+                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
             }
 
         }

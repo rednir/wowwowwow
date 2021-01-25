@@ -74,6 +74,10 @@ namespace wowwowwow
             lastChannel = recievedMessage.Channel;
             if (recievedMessage.Content.StartsWith(CommandManager.commandIdentifier))
             {
+                if (recievedMessage.Content == CommandManager.commandIdentifier)
+                {
+                    await verboseManager.sendEmbedMessage(embedMessage.Info("To view a list of commands, use `!wow help`"));
+                }
                 await commandManager.Execute(recievedMessage.Content);
                 return;
             }
