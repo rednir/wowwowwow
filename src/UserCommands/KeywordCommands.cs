@@ -14,36 +14,36 @@ namespace wowwowwow.UserCommands
     {
         public async Task Add(List<string> parameters)
         {
-            //await verboseManager.sendEmbedMessage(new LogMessage(LogSeverity.Debug, "Program", $"{parameters[0]}"));
+            //await verboseManager.SendEmbedMessage(new LogMessage(LogSeverity.Debug, "Program", $"{parameters[0]}"));
 
             DataManager.keywords.Add(parameters[0], parameters[1]);
             await dataManager.SaveData();
-            await verboseManager.sendEmbedMessage(embedMessage.Info($"{parameters[0]} was added as a keyword"));
+            await verboseManager.SendEmbedMessage(embedMessage.Info($"{parameters[0]} was added as a keyword"));
         }
 
         public async Task Remove(List<string> parameters)
         {
             if (!DataManager.keywords.ContainsKey(parameters[0]))
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
                 return;
             }
             DataManager.keywords.Remove(parameters[0]);
             await dataManager.SaveData();
-            await verboseManager.sendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was removed"));
+            await verboseManager.SendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was removed"));
         }
 
         public async Task Edit(List<string> parameters)
         {
             if (!DataManager.keywords.ContainsKey(parameters[0]))
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
                 return;
             }
             DataManager.keywords.Remove(parameters[0]);
             DataManager.keywords.Add(parameters[0], parameters[1]);
             await dataManager.SaveData();
-            await verboseManager.sendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was edited"));
+            await verboseManager.SendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was edited"));
         }
 
         public async Task List()
@@ -62,7 +62,7 @@ namespace wowwowwow.UserCommands
                 }
 
             }
-            await verboseManager.sendEmbedMessage(embedMessage.Info(sb.ToString()));
+            await verboseManager.SendEmbedMessage(embedMessage.Info(sb.ToString()));
         }
 
     }

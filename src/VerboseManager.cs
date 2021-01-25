@@ -14,7 +14,7 @@ namespace wowwowwow
 
         private EmbedMessage embedMessage = new EmbedMessage();
 
-        public async Task sendEmbedMessage(EmbedMessage message)
+        public async Task SendEmbedMessage(EmbedMessage message)
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.WithTitle(message.title);

@@ -59,7 +59,7 @@ namespace wowwowwow
             Console.WriteLine(msg.ToString());
             if (msg.Severity <= Program.logLevel)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Log($"{msg.Message}", msg.Severity, msg.Source));
+                await verboseManager.SendEmbedMessage(embedMessage.Log($"{msg.Message}", msg.Severity, msg.Source));
             }
         }
 
@@ -105,7 +105,7 @@ namespace wowwowwow
             }
             catch (Exception ex)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex.Message}```"));
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex.Message}```"));
                 await mainCommands.Help();
             }
 
@@ -134,7 +134,7 @@ namespace wowwowwow
                     break;
 
                 default:
-                    await verboseManager.sendEmbedMessage(embedMessage.Error($"No such command.{pointerToHelpText}"));
+                    await verboseManager.SendEmbedMessage(embedMessage.Error($"No such command.{pointerToHelpText}"));
                     //await mainCommands.Help();
                     break;
             }
@@ -164,18 +164,18 @@ namespace wowwowwow
                         break;
 
                     default:
-                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.\n{pointerToHelpText}"));
+                        await verboseManager.SendEmbedMessage(embedMessage.Error($"\nNo such command.\n{pointerToHelpText}"));
                         break;
 
                 }
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"Could not execute the command, the following error was returned:```{ex.Message}```Ensure that keywords and values are quoted like \"this\""));
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"Could not execute the command, the following error was returned:```{ex.Message}```Ensure that keywords and values are quoted like \"this\""));
             }
             catch (IndexOutOfRangeException)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"A command was specified with a missing option.{pointerToHelpText}"));
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"A command was specified with a missing option.{pointerToHelpText}"));
             }
 
         }
@@ -203,14 +203,14 @@ namespace wowwowwow
                         break;
 
                     default:
-                        await verboseManager.sendEmbedMessage(embedMessage.Error($"\nNo such command.{pointerToHelpText}"));
+                        await verboseManager.SendEmbedMessage(embedMessage.Error($"\nNo such command.{pointerToHelpText}"));
                         break;
 
                 }
             }
             catch (IndexOutOfRangeException)
             {
-                await verboseManager.sendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
             }
 
         }

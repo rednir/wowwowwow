@@ -14,21 +14,21 @@ namespace wowwowwow.UserCommands
     {
         public async Task Ignore(string user, string value)
         {
-            await verboseManager.sendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
+            await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
         }
 
         public async Task ReactToDelete(string value)
         {
-            await verboseManager.sendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
+            await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
         }
 
         public async Task QuietMode(string value)
         {
-            await verboseManager.sendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
+            await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
         }
         public async Task Reset()
         {
-            await verboseManager.sendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
+            await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
         }
 
 

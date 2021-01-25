@@ -57,10 +57,10 @@ namespace wowwowwow
 
         private async Task ReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            //verboseManager.sendEmbedMessage(embedMessage.Info(reaction.Emote.Name.ToString()));
             var message = await cachedMessage.GetOrDownloadAsync();
             if (message.Author.Id == botAccountID && reaction.UserId != botAccountID && reaction.Emote.Name == deleteReactionText)
             {
+                Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"ReactionAdded (Delete by: {reaction.User})").ToString());
                 await message.DeleteAsync();
             }
         }
@@ -77,7 +77,7 @@ namespace wowwowwow
             {
                 if (recievedMessage.Content == CommandManager.commandIdentifier)
                 {
-                    await verboseManager.sendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
+                    await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
                     return;
                 }
                 await commandManager.Execute(recievedMessage.Content);
@@ -91,7 +91,7 @@ namespace wowwowwow
             {
                 if (DataManager.keywords[foundKeywords].StartsWith("http"))
                 {
-                    await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords], true));
+                    await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords], true));
                     return;
                 }
             }
@@ -101,7 +101,7 @@ namespace wowwowwow
                 return;
             }
             Console.WriteLine(foundKeywords);
-            await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords]));
+            await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords]));
         }
 
 
