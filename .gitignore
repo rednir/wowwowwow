@@ -2,3 +2,4 @@ bin/
 obj/
 token*
 keywords*
+config*

@@ -12,17 +12,21 @@ namespace wowwowwow
 {
     public class DataManager
     {
-
+        public const string keywordsFile = "keywords.json";
+        public const string configFile = "config.json";
         public static Dictionary<string, string> keywords = new Dictionary<string, string>();
+        public static Dictionary<string, dynamic> config = new Dictionary<string, dynamic>();
 
         public async Task LoadData()
         {
-            await Task.Run(() => keywords = JsonSerializer.Deserialize<Dictionary<String, String>>(File.ReadAllText("keywords.json")));
+            await Task.Run(() => keywords = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(keywordsFile)));
+            await Task.Run(() => config = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(File.ReadAllText(configFile)));
         }
 
         public async Task SaveData()
         {
-            await File.WriteAllTextAsync("keywords.json", JsonSerializer.Serialize(keywords));
+            await File.WriteAllTextAsync(keywordsFile, JsonSerializer.Serialize(keywords));
+            await File.WriteAllTextAsync(configFile, JsonSerializer.Serialize(config));
         }
 
     }

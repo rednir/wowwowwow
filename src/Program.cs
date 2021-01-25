@@ -68,6 +68,7 @@ namespace wowwowwow
 
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {
+            Console.WriteLine($"[{recievedMessage.Timestamp}] {recievedMessage.Author}: {recievedMessage.Content}");
             if (isBotPaused || recievedMessage.Author.Id == botAccountID)
             {
                 return;
@@ -97,10 +98,9 @@ namespace wowwowwow
             }
             catch (ArgumentNullException)
             {
-                Console.WriteLine(recievedMessage);
                 return;
             }
-            Console.WriteLine(foundKeywords);
+
             await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords]));
         }
 
