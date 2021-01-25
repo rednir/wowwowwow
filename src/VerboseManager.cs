@@ -74,7 +74,7 @@ namespace wowwowwow
             }
             public EmbedMessage Log(string toBeDescription)
             {
-                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.DarkGrey, timeUntilDelete = 20000 };
+                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.DarkGrey, timeUntilDelete = 15000 };
             }
             public EmbedMessage KeywordResponse(string toBeDescription, bool toBeImage = false)
             {

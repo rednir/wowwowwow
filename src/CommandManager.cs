@@ -32,13 +32,14 @@ namespace wowwowwow
             "Main commands:",
             " - `!wow help`",
             " - `!wow reload`",
+            " - `!wow blacklist <user tag>` todo",
             " - `!wow pause <minutes>`",
 
             "\nKeyword commands:",
             " - `!wow keyword list`",
-            " - `!wow keyword add \"<keyword>\" \"<value>\"`",
+            " - `!wow keyword add \"<keyword>\" \"<optional: image>\" \"<value>\"`",
             " - `!wow keyword remove \"<keyword>\"`",
-            " - `!wow keyword edit \"<keyword>\" \"<value>\"`",
+            " - `!wow keyword edit \"<keyword>\" \"<optional: image>\" \"<value>\"`",
 
             "\nOther commands:",
             " - `!`"

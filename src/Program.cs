@@ -86,7 +86,7 @@ namespace wowwowwow
 
 
 
-
+        // todo: rewrite
         private dynamic CheckStringForKeyword(string s)
         {
             List<string> listOfKeywords = new List<string>();
