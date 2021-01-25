@@ -76,7 +76,8 @@ namespace wowwowwow
             {
                 if (recievedMessage.Content == CommandManager.commandIdentifier)
                 {
-                    await verboseManager.sendEmbedMessage(embedMessage.Info("To view a list of commands, use `!wow help`"));
+                    await verboseManager.sendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
+                    return;
                 }
                 await commandManager.Execute(recievedMessage.Content);
                 return;

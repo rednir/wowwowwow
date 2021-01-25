@@ -47,7 +47,7 @@ namespace wowwowwow
 
             if (message.isThereDeleteOption)
             {
-                embed.WithFooter($"Is this message annoying? Click on the {new Emoji(Program.deleteReactionText)} to delete it!");
+                embed.WithFooter($"ᴵˢ ᵗʰᶦˢ ᵐᵉˢˢᵃᵍᵉ ᵃⁿⁿᵒʸᶦⁿᵍˀ ᴿᵉᵃᶜᵗ ᵗᵒ ᵈᵉˡᵉᵗᵉ ᶦᵗᵎ");
                 var messageWithDeleteOption = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
                 await messageWithDeleteOption.AddReactionAsync(new Emoji(Program.deleteReactionText));
                 return;
