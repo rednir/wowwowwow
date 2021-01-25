@@ -6,7 +6,7 @@ namespace wowwowwow.UserCommands
 {
     public class Main : UserCommands
     {
-        
+
         public async Task Help()
         {
             await verboseManager.sendEmbedMessage(embedMessage.Info(commandManager.helpText));
@@ -14,8 +14,8 @@ namespace wowwowwow.UserCommands
 
         public async Task Reload()
         {
-            await commandManager.LoadKeywords();
-            await verboseManager.sendEmbedMessage(embedMessage.Info($"{CommandManager.keywords.Count} keywords were reloaded"));
+            await dataManager.LoadData();
+            await verboseManager.sendEmbedMessage(embedMessage.Info($"{DataManager.keywords.Count} keywords were reloaded"));
         }
 
         public async Task Echo(string command)

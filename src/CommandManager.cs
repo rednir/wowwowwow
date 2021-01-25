@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.IO;
 using Discord;
 using Discord.WebSocket;
-using wowwowwow.UserCommands;
+
 
 namespace wowwowwow
 {
@@ -54,8 +54,6 @@ namespace wowwowwow
             " - `!wow config reset`"
         });
 
-        public static Dictionary<string, string> keywords = new Dictionary<string, string>();
-
         public async Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
@@ -63,16 +61,6 @@ namespace wowwowwow
             {
                 await verboseManager.sendEmbedMessage(embedMessage.Log($"{msg.Message}", msg.Severity, msg.Source));
             }
-        }
-
-        public async Task LoadKeywords()
-        {
-            await Task.Run(() => keywords = JsonSerializer.Deserialize<Dictionary<String, String>>(File.ReadAllText("keywords.json")));
-        }
-
-        public async Task SaveKeywords()
-        {
-            await File.WriteAllTextAsync("keywords.json", JsonSerializer.Serialize(keywords));
         }
 
         public async Task Execute(string command)

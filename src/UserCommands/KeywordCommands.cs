@@ -16,33 +16,33 @@ namespace wowwowwow.UserCommands
         {
             //await verboseManager.sendEmbedMessage(new LogMessage(LogSeverity.Debug, "Program", $"{parameters[0]}"));
 
-            CommandManager.keywords.Add(parameters[0], parameters[1]);
-            await commandManager.SaveKeywords();
+            DataManager.keywords.Add(parameters[0], parameters[1]);
+            await dataManager.SaveData();
             await verboseManager.sendEmbedMessage(embedMessage.Info($"{parameters[0]} was added as a keyword"));
         }
 
         public async Task Remove(List<string> parameters)
         {
-            if (!CommandManager.keywords.ContainsKey(parameters[0]))
+            if (!DataManager.keywords.ContainsKey(parameters[0]))
             {
                 await verboseManager.sendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
                 return;
             }
-            CommandManager.keywords.Remove(parameters[0]);
-            await commandManager.SaveKeywords();
+            DataManager.keywords.Remove(parameters[0]);
+            await dataManager.SaveData();
             await verboseManager.sendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was removed"));
         }
 
         public async Task Edit(List<string> parameters)
         {
-            if (!CommandManager.keywords.ContainsKey(parameters[0]))
+            if (!DataManager.keywords.ContainsKey(parameters[0]))
             {
                 await verboseManager.sendEmbedMessage(embedMessage.Error($"The keyword '{parameters[0]}' does not exist"));
                 return;
             }
-            CommandManager.keywords.Remove(parameters[0]);
-            CommandManager.keywords.Add(parameters[0], parameters[1]);
-            await commandManager.SaveKeywords();
+            DataManager.keywords.Remove(parameters[0]);
+            DataManager.keywords.Add(parameters[0], parameters[1]);
+            await dataManager.SaveData();
             await verboseManager.sendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was edited"));
         }
 
@@ -50,7 +50,7 @@ namespace wowwowwow.UserCommands
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("**List of keywords:**");
-            foreach (var keyword in CommandManager.keywords.Keys)
+            foreach (var keyword in DataManager.keywords.Keys)
             {
                 if (keyword.StartsWith("@"))
                 {

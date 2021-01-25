@@ -21,6 +21,7 @@ namespace wowwowwow
 
         public static bool isBotPaused = false;
 
+        private DataManager dataManager = new DataManager();
         private CommandManager commandManager = new CommandManager();
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
@@ -46,7 +47,7 @@ namespace wowwowwow
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
-            await commandManager.LoadKeywords();
+            await dataManager.LoadData();
             _client.MessageReceived += MessageRecieved;
             _client.ReactionAdded += ReactionAdded;
 
@@ -88,9 +89,9 @@ namespace wowwowwow
             var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
             try
             {
-                if (CommandManager.keywords[foundKeywords].StartsWith("http"))
+                if (DataManager.keywords[foundKeywords].StartsWith("http"))
                 {
-                    await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(CommandManager.keywords[foundKeywords], true));
+                    await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords], true));
                     return;
                 }
             }
@@ -100,7 +101,7 @@ namespace wowwowwow
                 return;
             }
             Console.WriteLine(foundKeywords);
-            await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(CommandManager.keywords[foundKeywords]));
+            await verboseManager.sendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords]));
         }
 
 
@@ -112,7 +113,7 @@ namespace wowwowwow
             List<string> listOfKeywords = new List<string>();
             string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
 
-            foreach (var k in CommandManager.keywords.Keys)
+            foreach (var k in DataManager.keywords.Keys)
             {
                 string keyword = k.ToLower();
                 if (stringToSearch.Contains(keyword, StringComparison.OrdinalIgnoreCase))
