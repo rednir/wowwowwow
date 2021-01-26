@@ -14,6 +14,15 @@ namespace wowwowwow
 
         private EmbedMessage embedMessage = new EmbedMessage();
 
+        public async Task Log(LogMessage msg)
+        {
+            Console.WriteLine(msg.ToString());
+            if (msg.Severity <= Program.logLevel)
+            {
+                await SendEmbedMessage(embedMessage.Log($"{msg.Message}", msg.Severity, msg.Source));
+            }
+        }
+
         public async Task SendEmbedMessage(EmbedMessage message)
         {
             EmbedBuilder embed = new EmbedBuilder();

@@ -43,7 +43,7 @@ namespace wowwowwow
             var token = File.ReadAllText("token.txt");
             _client = new DiscordSocketClient();
 
-            _client.Log += commandManager.Log;
+            _client.Log += verboseManager.Log;
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
