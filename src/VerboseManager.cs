@@ -45,7 +45,7 @@ namespace wowwowwow
             }
 
 
-            if (message.isThereDeleteOption)
+            if (message.isThereDeleteOption && DataManager.config["reactToDelete"])
             {
                 embed.WithFooter($"ᴵˢ ᵗʰᶦˢ ᵐᵉˢˢᵃᵍᵉ ᵃⁿⁿᵒʸᶦⁿᵍˀ ᴿᵉᵃᶜᵗ ᵗᵒ ᵈᵉˡᵉᵗᵉ ᶦᵗᵎ");
                 var messageWithDeleteOption = await Program.lastChannel.SendMessageAsync("", false, embed.Build());

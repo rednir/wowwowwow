@@ -22,7 +22,8 @@ namespace wowwowwow
             await Task.Run(() => keywords = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(keywordsFileName)));
             await Task.Run(() => config = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(File.ReadAllText(configFileName)));
 
-            config["ignore"] = JsonElementToList<ulong>(config["ignore"]);
+            config["ignore"] = JsonElementToObject<List<ulong>>(config["ignore"]);
+            config["reactToDelete"] = JsonElementToObject<bool>(config["reactToDelete"]);
         }
 
         public async Task SaveData()
@@ -31,13 +32,14 @@ namespace wowwowwow
             await File.WriteAllTextAsync(configFileName, JsonSerializer.Serialize(config));
         }
 
-        public List<T> JsonElementToList<T>(JsonElement element)
+        public Object JsonElementToObject<T>(JsonElement element)
         {
-            return JsonSerializer.Deserialize<List<T>>(element.GetRawText());
+            return JsonSerializer.Deserialize<T>(element.GetRawText());
         }
 
         public async Task SyncData()
         {
+            // use this to save json to file, but keep all elements easily readable though code
             await SaveData();
             await LoadData();
         }

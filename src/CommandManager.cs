@@ -108,7 +108,7 @@ namespace wowwowwow
             }
             catch (Exception ex)
             {
-                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex.Message}```"));
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex}```"));
             }
 
 
@@ -192,11 +192,11 @@ namespace wowwowwow
                         break;
 
                     case "react_to_delete":
-                        await configCommands.ReactToDelete(currentCommand.parameters[3]);
+                        await configCommands.ReactToDelete(currentCommand.split[3]);
                         break;
 
                     case "quiet_mode":
-                        await configCommands.QuietMode(currentCommand.parameters[3]);
+                        await configCommands.QuietMode(currentCommand.split[3]);
                         break;
 
                     case "reset":
