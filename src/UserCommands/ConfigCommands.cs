@@ -79,6 +79,7 @@ namespace wowwowwow.UserCommands
         {
             await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
         }
+        
         public async Task Reset()
         {
             await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));

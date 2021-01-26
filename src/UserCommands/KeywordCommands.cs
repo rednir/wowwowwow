@@ -18,7 +18,7 @@ namespace wowwowwow.UserCommands
 
             DataManager.keywords.Add(parameters[0], parameters[1]);
             await dataManager.SaveData();
-            await verboseManager.SendEmbedMessage(embedMessage.Info($"{parameters[0]} was added as a keyword"));
+            await verboseManager.SendEmbedMessage(embedMessage.Info($"The keyword '{parameters[0]}' was added"));
         }
 
         public async Task Remove(List<string> parameters)
