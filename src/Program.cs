@@ -27,7 +27,7 @@ namespace wowwowwow
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
 
-        public const LogSeverity logLevel = LogSeverity.Debug;
+        public const LogSeverity logLevel = LogSeverity.Error;
 
         public static ISocketMessageChannel lastChannel;
 

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.IO;
 using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 
 namespace wowwowwow
@@ -23,7 +24,7 @@ namespace wowwowwow
             }
         }
 
-        public async Task SendEmbedMessage(EmbedMessage message)
+        public async Task<RestUserMessage> SendEmbedMessage(EmbedMessage message)
         {
             EmbedBuilder embed = new EmbedBuilder();
             embed.WithTitle(message.title);
@@ -59,19 +60,19 @@ namespace wowwowwow
                 embed.WithFooter($"ᴵˢ ᵗʰᶦˢ ᵐᵉˢˢᵃᵍᵉ ᵃⁿⁿᵒʸᶦⁿᵍˀ ᴿᵉᵃᶜᵗ ᵗᵒ ᵈᵉˡᵉᵗᵉ ᶦᵗᵎ");
                 var messageWithDeleteOption = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
                 await messageWithDeleteOption.AddReactionAsync(new Emoji(Program.deleteReactionText));
-                return;
+                return messageWithDeleteOption;
             }
             if (message.timeUntilDelete > 0)
             {
                 embed.WithFooter($"This message will be deleted in {message.timeUntilDelete / 1000} seconds", "https://icons.iconarchive.com/icons/martz90/circle-addon2/256/warning-icon.png");
                 var messageToDelete = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
                 _ = Task.Delay(message.timeUntilDelete).ContinueWith((t) => messageToDelete.DeleteAsync());
-                return;
+                return null;
             }
 
 
             Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"sendEmbedMessage ({message.title}: {message.description})").ToString());
-            await Program.lastChannel.SendMessageAsync("", false, embed.Build());
+            return await Program.lastChannel.SendMessageAsync("", false, embed.Build());
         }
 
         public class EmbedMessage
@@ -106,6 +107,11 @@ namespace wowwowwow
             public EmbedMessage KeywordResponse(string toBeDescription, bool toBeImage = false)
             {
                 return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = toBeImage, isThereDeleteOption = true };
+            }
+
+            public EmbedMessage Progress(string toBeDescription)
+            {
+                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default };
             }
 
 

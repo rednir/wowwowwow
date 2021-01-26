@@ -95,7 +95,7 @@ namespace wowwowwow
                 switch (currentCommand.split[1])
                 {
                     case "vc":
-                        new Thread(async () => await ExecuteVoice()).Start();
+                        _ = ExecuteVoice();
                         return;
 
                     case "keyword":
@@ -146,7 +146,6 @@ namespace wowwowwow
         }
 
 
-        [Command("vc", RunMode = RunMode.Async)]
         private async Task ExecuteVoice()
         {
             try
@@ -162,7 +161,12 @@ namespace wowwowwow
                         return;
 
                     case "add":
-                        await voiceCommands.Add();
+                        // after error handling rework, change VoiceCommands.Join to throw error instead of return false
+                        if (await voiceCommands.Join((currentCommand.message.Author as IVoiceState).VoiceChannel))
+                        {
+                            // use quoted parameters if exists
+                            await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3]);
+                        }
                         return;
 
                     case "skip":
