@@ -1,22 +1,30 @@
 using System;
 using System.Threading.Tasks;
 using Discord;
+using Discord.WebSocket;
+using Discord.Commands;
+using Discord.Audio;
 
 namespace wowwowwow.UserCommands
 {
     public class Voice : UserCommands
     {
-
-        public async Task Join()
+        public static IAudioClient audioClient;
+        public async Task Join(IVoiceChannel vc = null)
         {
-            await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
+            if (vc == null)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Error("You must join a voice channel first before summoning the bot"));
+                return;
+            }
+            audioClient = await vc.ConnectAsync();
         }
 
         public async Task Leave()
         {
-            await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
+            await audioClient.StopAsync();
         }
-
+        
         public async Task Add()
         {
             await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));

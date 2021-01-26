@@ -7,13 +7,14 @@ using System.IO;
 using System.Linq;
 using Discord;
 using Discord.WebSocket;
+using Discord.Commands;
 
 namespace wowwowwow
 {
     public class Program
     {
 
-        public DiscordSocketClient _client;
+        public static DiscordSocketClient _client;
 
         public const long botAccountID = 802277381129764865;
 
@@ -73,7 +74,6 @@ namespace wowwowwow
                 await message.DeleteAsync();
             }
         }
-
 
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {

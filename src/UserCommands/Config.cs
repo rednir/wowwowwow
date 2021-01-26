@@ -28,10 +28,9 @@ namespace wowwowwow.UserCommands
             }
         }
 
-        public async Task Ignore(IReadOnlyCollection<Discord.WebSocket.SocketUser> userCollection, string value)
+        public async Task Ignore(SocketUser user, string value)
         {
             bool boolValue = Convert.ToBoolean(value);
-            SocketUser user = Enumerable.ElementAt(userCollection, 0);
             if (user.Id == Program.botAccountID)
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error("The bot is always on the ignore list."));

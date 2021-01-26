@@ -1,10 +1,13 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using System.Text.Json;
 using System.IO;
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 
 
@@ -92,7 +95,7 @@ namespace wowwowwow
                 switch (currentCommand.split[1])
                 {
                     case "vc":
-                        await ExecuteVoice();
+                        new Thread(async () => await ExecuteVoice()).Start();
                         return;
 
                     case "keyword":
@@ -112,7 +115,6 @@ namespace wowwowwow
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex}```"));
             }
-
 
         }
 
@@ -144,6 +146,7 @@ namespace wowwowwow
         }
 
 
+        [Command("vc", RunMode = RunMode.Async)]
         private async Task ExecuteVoice()
         {
             try
@@ -151,7 +154,7 @@ namespace wowwowwow
                 switch (currentCommand.split[2])
                 {
                     case "join":
-                        await voiceCommands.Join();
+                        await voiceCommands.Join((currentCommand.message.Author as IVoiceState).VoiceChannel);
                         return;
                     
                     case "leave":
@@ -172,10 +175,15 @@ namespace wowwowwow
 
                 }
             }
-            catch 
+            catch (IndexOutOfRangeException)
             {
-                
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
             }
+            catch (Exception ex)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex}```"));
+            }
+
         }
 
 
@@ -225,7 +233,7 @@ namespace wowwowwow
                 switch (currentCommand.split[2])
                 {
                     case "ignore":
-                        await configCommands.Ignore(currentCommand.message.MentionedUsers, currentCommand.split[4]);
+                        await configCommands.Ignore(Enumerable.ElementAt(currentCommand.message.MentionedUsers, 0), currentCommand.split[4]);
                         return;
 
                     case "react_to_delete":

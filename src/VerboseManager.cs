@@ -11,7 +11,7 @@ namespace wowwowwow
 {
     public class VerboseManager
     {
-
+        // TODO: better error handling with throw
         private EmbedMessage embedMessage = new EmbedMessage();
 
         public async Task Log(LogMessage msg)
