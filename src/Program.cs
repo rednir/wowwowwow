@@ -50,8 +50,17 @@ namespace wowwowwow
             await dataManager.LoadData();
             _client.MessageReceived += MessageRecieved;
             _client.ReactionAdded += ReactionAdded;
+            _client.Ready += Ready;
+            
+            
 
             await Task.Delay(-1);
+        }
+
+
+        private async Task Ready()
+        {
+            await _client.SetGameAsync("!wow help", null, ActivityType.Playing);
         }
 
 
