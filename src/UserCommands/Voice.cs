@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
@@ -17,11 +18,13 @@ namespace wowwowwow.UserCommands
     public class Voice : UserCommands
     {
         public static IAudioClient audioClient;
-        AudioOutStream audioOutStream;
+        AudioOutStream audioOutStream = null;
         private static Queue<string[]> audioQueue = new Queue<string[]>();
-        private static IVoiceChannel activeVoiceChannel;
+        private static IVoiceChannel activeVoiceChannel = null;
 
+        private static bool IsCurrentlyDownloading = false;
         public static string downloadFilePath = "/tmp/wowwowwow-vc.m4a";
+
 
         private Process CreateStream(string path)
         {
@@ -68,25 +71,45 @@ namespace wowwowwow.UserCommands
         }
 
 
-        private async Task Continue(IVoiceChannel newActiveVoiceChannel = null)
+        private async Task LeaveBeforeReJoin()
         {
             try
             {
-                if (await Download())
+                if (audioClient.ConnectionState == ConnectionState.Connecting || audioClient.ConnectionState == ConnectionState.Connected)
                 {
-                    await Join(activeVoiceChannel == null ? newActiveVoiceChannel : activeVoiceChannel);
-                    await Play();
+                    // disconnect first before re-connecting, reduces chance of trying to connect too early
+                    await audioClient.StopAsync();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                if (activeVoiceChannel == null)
-                {
-                    // the bot probably left intentionally
-                    return;
-                }
-                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex}```"));
+                // exception will be thrown here if the audio client doesn't exist. this doesn't matter.
             }
+        }
+
+
+        private async Task Continue()
+        {
+
+            try
+            {
+                Console.Write($"aaaaaaaaaaaaaaaaaaaaa LEAVING IN CONTINUE() {audioQueue.Count} {Program._client.GetUser(Convert.ToUInt64(audioQueue.Peek()[1]))}\n");
+                SocketUser user = Program._client.GetUser(Convert.ToUInt64(audioQueue.Peek()[1]));
+                //activeVoiceChannel = (user as IGuildUser).VoiceChannel;
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is FormatException)
+            {
+
+                await Leave(string.Empty);
+                return;
+            }
+            Console.WriteLine($"---- activeVoiceChannel = {activeVoiceChannel}\n--\n");
+            if (await Download())
+            {
+                await Join(activeVoiceChannel);
+                await Play();
+            }
+
         }
 
 
@@ -101,7 +124,8 @@ namespace wowwowwow.UserCommands
                 }
                 finally
                 {
-                    await audioOutStream.FlushAsync();
+                    audioOutStream = null;
+                    audioQueue.Dequeue();
                 }
             }
 
@@ -112,53 +136,50 @@ namespace wowwowwow.UserCommands
 
         private async Task<bool> Download()
         {
-            string toPlay = string.Empty;
+            // this is all in a try statement because no matter what happens, i need IsCurrentlyDownloading to be accurate
             try
             {
-                toPlay = audioQueue.Peek()[0];
-                audioQueue.Dequeue();
-            }
-            catch (InvalidOperationException)
-            {
-                await Leave(string.Empty);
-                return false;
-            }
+                IsCurrentlyDownloading = true;
+                string toPlay = string.Empty;
+                try
+                {
+                    toPlay = audioQueue.Peek()[0];
+                }
+                catch (InvalidOperationException)
+                {
+                    await Leave(string.Empty);
+                    return false;
+                }
+                await LeaveBeforeReJoin();
 
-            RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress("Downloading..."));
-            string output = YoutubeDl(toPlay, toPlay.StartsWith("http") ? true : false);
-            await downloadingMessage.DeleteAsync();
-            if (output != string.Empty)
-            {
-                await verboseManager.SendEmbedMessage(embedMessage.Warning($"An error was returned when downloading the audio file:```{output}```This may or may not be fatal."));
+                RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress("Downloading..."));
+                string output = YoutubeDl(toPlay, toPlay.StartsWith("http") ? true : false);
+                await downloadingMessage.DeleteAsync();
+                if (output != string.Empty)
+                {
+                    await verboseManager.SendEmbedMessage(embedMessage.Warning($"An error was returned when downloading the audio file:```{output}```This may or may not be fatal."));
+                }
+                return true;
             }
-            return true;
+            finally
+            {
+                IsCurrentlyDownloading = false;
+            }
         }
 
-
+        // doesnt work if called from command, fix this or rework.
         // todo: this shouldnt need a bool return after error handle rework
         public async Task<bool> Join(IVoiceChannel vc = null)
         {
+            Console.WriteLine($"vc = {vc}\nactivevc= {activeVoiceChannel}\n--\n");
             if (vc == null)
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error("You must join a voice channel first before summoning the bot"));
                 return false;
             }
-
-            try
-            {
-                if (audioClient.ConnectionState == ConnectionState.Connecting || audioClient.ConnectionState == ConnectionState.Connected)
-                {
-                    // disconnect first before re-connecting, reduces chance of trying to connect too early
-                    await audioClient.StopAsync();
-                }
-            }
-            catch
-            {
-                // exception will be thrown here if the audio client doesn't exist. this doesn't matter.
-            }
-
-            await Task.Delay(1000);
+            //await Task.Delay(500);
             activeVoiceChannel = vc;
+            Console.WriteLine("AUDIO CLIENT CREATED\n--\n");
             audioClient = await vc.ConnectAsync();
 
             return true;
@@ -188,17 +209,28 @@ namespace wowwowwow.UserCommands
         {
             audioQueue.Enqueue(new string[] { toPlay, user.Id.ToString() });
             await verboseManager.SendEmbedMessage(embedMessage.Info($"At the request of {user.Mention}, the following was placed in the {(audioQueue.Count == 1 ? "**next**" : $"**number {audioQueue.Count}**")} spot in the queue:\n\n{(toPlay.StartsWith("http") ? toPlay : $"Search for: `{toPlay}`")}"));
-            if (audioOutStream == null)
+            if (activeVoiceChannel == null)
             {
                 // if nothing is playing, then download and play
-                _ = Continue((user as IGuildUser).VoiceChannel);
+                activeVoiceChannel = (user as IGuildUser).VoiceChannel;
+                Console.WriteLine($"activeVoiceChannel = {activeVoiceChannel}\n--\n");
+                await Continue();
+            }
+            else
+            {
+                activeVoiceChannel = (user as IGuildUser).VoiceChannel;
             }
         }
 
 
         public async Task Skip()
         {
-            await verboseManager.SendEmbedMessage(embedMessage.Warning("This doesn't do anything yet"));
+            if (IsCurrentlyDownloading)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Error("For safety, please wait until downloading has finished before skipping"));
+                return;
+            }
+            await Continue();
         }
 
 

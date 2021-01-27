@@ -149,6 +149,10 @@ namespace wowwowwow
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
             }
+            catch (OperationCanceledException)
+            {
+                // usually if this is thrown (like on Skip()), everything still continues as normal
+            }
             catch (Exception ex)
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex}```"));
