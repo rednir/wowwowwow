@@ -132,12 +132,7 @@ namespace wowwowwow
                         return;
 
                     case "add":
-                        // after error handling rework, change VoiceCommands.Join to throw error instead of return false
-                        if (await voiceCommands.Join((currentCommand.message.Author as IVoiceState).VoiceChannel))
-                        {
-                            // use quoted parameters if exists
-                            await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3]);
-                        }
+                        await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3], currentCommand.message.Author);
                         return;
 
                     case "skip":

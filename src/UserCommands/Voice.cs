@@ -17,6 +17,9 @@ namespace wowwowwow.UserCommands
     public class Voice : UserCommands
     {
         public static IAudioClient audioClient;
+        AudioOutStream audioOutStream;
+        private static Queue<string[]> audioQueue = new Queue<string[]>();
+        private static IVoiceChannel activeVoiceChannel;
 
         public static string downloadFilePath = "/tmp/wowwowwow-vc.m4a";
 
@@ -65,14 +68,71 @@ namespace wowwowwow.UserCommands
         }
 
 
-        private async Task SendVideo(string path)
+        private async Task Continue(IVoiceChannel newActiveVoiceChannel = null)
         {
-            using (var ffmpeg = CreateStream(path))
-            using (var stream = audioClient.CreatePCMStream(AudioApplication.Music))
+            try
             {
-                try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
-                finally { await stream.FlushAsync(); }
+                if (await Download())
+                {
+                    await Join(activeVoiceChannel == null ? newActiveVoiceChannel : activeVoiceChannel);
+                    await Play();
+                }
             }
+            catch (Exception ex)
+            {
+                if (activeVoiceChannel == null)
+                {
+                    // the bot probably left intentionally
+                    return;
+                }
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nCould not execute the command, the following error was returned:```{ex}```"));
+            }
+        }
+
+
+        private async Task Play()
+        {
+            using (var ffmpeg = CreateStream(downloadFilePath))
+            using (audioOutStream = audioClient.CreatePCMStream(AudioApplication.Music))
+            {
+                try
+                {
+                    await ffmpeg.StandardOutput.BaseStream.CopyToAsync(audioOutStream);
+                }
+                finally
+                {
+                    await audioOutStream.FlushAsync();
+                }
+            }
+
+            // once playback has ended, download and play next in queue
+            Console.WriteLine("playback ended, continuing\n-\n--\n---\n----");
+            _ = Continue();
+        }
+
+
+        private async Task<bool> Download()
+        {
+            string toPlay = string.Empty;
+            try
+            {
+                toPlay = audioQueue.Peek()[0];
+                audioQueue.Dequeue();
+            }
+            catch (InvalidOperationException)
+            {
+                await Leave(string.Empty);
+                return false;
+            }
+
+            RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress("Downloading..."));
+            string output = YoutubeDl(toPlay, toPlay.StartsWith("http") ? true : false);
+            await downloadingMessage.DeleteAsync();
+            if (output != string.Empty)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Warning($"An error was returned when downloading the audio file:```{output}```This may or may not be fatal."));
+            }
+            return true;
         }
 
 
@@ -84,41 +144,55 @@ namespace wowwowwow.UserCommands
                 await verboseManager.SendEmbedMessage(embedMessage.Error("You must join a voice channel first before summoning the bot"));
                 return false;
             }
+
             try
             {
                 if (audioClient.ConnectionState == ConnectionState.Connecting || audioClient.ConnectionState == ConnectionState.Connected)
                 {
                     // disconnect first before re-connecting, reduces chance of trying to connect too early
                     await audioClient.StopAsync();
-                    await Task.Delay(100);
                 }
             }
-            catch {}
-            
+            catch
+            {
+                // exception will be thrown here if the audio client doesn't exist. this doesn't matter.
+            }
+
+            await Task.Delay(100);
+            activeVoiceChannel = vc;
             audioClient = await vc.ConnectAsync();
+
             return true;
         }
 
-        public async Task Leave()
+
+        public async Task Leave(string message = "then i'll leave.... Sadge")
         {
-            await verboseManager.SendEmbedMessage(embedMessage.Info($"then i'll leave.... Sadge"));
+            if (activeVoiceChannel == null)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Warning("This command does nothing if I'm not in a voice call."));
+                return;
+            }
+            if (message != string.Empty)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Info(message));
+            }
+            activeVoiceChannel = null;
+            audioOutStream = null;
             await audioClient.StopAsync();
         }
 
-        // todo: this suffers from baed error handling
-        public async Task Add(string url)
-        {
-            RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress("Downloading..."));
-            string output = YoutubeDl(url, url.StartsWith("http") ? true : false);
-            await downloadingMessage.DeleteAsync();
-            if (output != string.Empty)
-            {
-                await verboseManager.SendEmbedMessage(embedMessage.Warning($"An error was returned when downloading the audio file:```{output}```This may or may not be fatal."));
-                return;
-            }
-            await verboseManager.SendEmbedMessage(embedMessage.Info($"The following audio was placed in the number {0.ToString()} spot in the queue:\n{url}"));
-            await SendVideo(downloadFilePath);
 
+        // todo: this suffers from baed error handling
+        public async Task Add(string toPlay, SocketUser user)
+        {
+            audioQueue.Enqueue(new string[] { toPlay, user.Id.ToString() });
+            await verboseManager.SendEmbedMessage(embedMessage.Info($"At the request of {user.Mention}, the following was placed in the {(audioQueue.Count == 1 ? "**next**" : $"**number {audioQueue.Count}**")} spot in the queue:\n\n{(toPlay.StartsWith("http") ? toPlay : $"Search for: `{toPlay}`")}"));
+            if (audioOutStream == null)
+            {
+                // if nothing is playing, then download and play
+                _ = Continue((user as IGuildUser).VoiceChannel);
+            }
         }
 
 
