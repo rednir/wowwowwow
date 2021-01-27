@@ -43,35 +43,41 @@ namespace wowwowwow
                 {
                     message.description = "";
                 }
-                embed.WithDescription(message.description);
             }
-            else
-            {
-                embed.WithDescription(message.description);
-            }
+
             if (message.logSeverity != new LogSeverity())
             {
                 embed.WithTitle($"{message.logSource} {message.logSeverity}");
             }
 
-
             if (message.isThereDeleteOption && DataManager.config["reactToDelete"])
             {
                 embed.WithFooter($"ᴵˢ ᵗʰᶦˢ ᵐᵉˢˢᵃᵍᵉ ᵃⁿⁿᵒʸᶦⁿᵍˀ ᴿᵉᵃᶜᵗ ᵗᵒ ᵈᵉˡᵉᵗᵉ ᶦᵗᵎ");
+                embed.WithDescription(message.description);
+
                 var messageWithDeleteOption = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
                 await messageWithDeleteOption.AddReactionAsync(new Emoji(Program.deleteReactionText));
                 return messageWithDeleteOption;
             }
+
             if (message.timeUntilDelete > 0)
             {
+                embed.WithDescription(message.description);
                 embed.WithFooter($"This message will be deleted in {message.timeUntilDelete / 1000} seconds", "https://icons.iconarchive.com/icons/martz90/circle-addon2/256/warning-icon.png");
                 var messageToDelete = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
                 _ = Task.Delay(message.timeUntilDelete).ContinueWith((t) => messageToDelete.DeleteAsync());
                 return null;
             }
 
+            if (message.isLoading)
+            {
+                embed.WithFooter(message.description, "https://i.gifer.com/ZZ5H.gif");
+                return await Program.lastChannel.SendMessageAsync("", false, embed.Build());
+            }
 
             Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"sendEmbedMessage ({message.title}: {message.description})").ToString());
+            
+            embed.WithDescription(message.description);
             return await Program.lastChannel.SendMessageAsync("", false, embed.Build());
         }
 
@@ -84,8 +90,9 @@ namespace wowwowwow
             public bool isThereDeleteOption { get; set; }
             public int timeUntilDelete { get; set; }
             public bool isImage { get; set; }
-            public LogSeverity logSeverity { get; set; } = new LogSeverity();
+            public bool isLoading { get; set; }
 
+            public LogSeverity logSeverity { get; set; } = new LogSeverity();
             public string logSource { get; set; }
 
             public EmbedMessage Error(string toBeDescription)
@@ -111,7 +118,7 @@ namespace wowwowwow
 
             public EmbedMessage Progress(string toBeDescription)
             {
-                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default };
+                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default, isLoading = true};
             }
 
 

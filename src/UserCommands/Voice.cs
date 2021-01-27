@@ -106,7 +106,6 @@ namespace wowwowwow.UserCommands
             }
 
             // once playback has ended, download and play next in queue
-            Console.WriteLine("playback ended, continuing\n-\n--\n---\n----");
             _ = Continue();
         }
 
@@ -158,7 +157,7 @@ namespace wowwowwow.UserCommands
                 // exception will be thrown here if the audio client doesn't exist. this doesn't matter.
             }
 
-            await Task.Delay(100);
+            await Task.Delay(1000);
             activeVoiceChannel = vc;
             audioClient = await vc.ConnectAsync();
 
@@ -166,7 +165,7 @@ namespace wowwowwow.UserCommands
         }
 
 
-        public async Task Leave(string message = "then i'll leave.... Sadge")
+        public async Task Leave(string message = "The bot has been disconnected from the voice channel and the queue has been cleared.")
         {
             if (activeVoiceChannel == null)
             {
@@ -179,6 +178,7 @@ namespace wowwowwow.UserCommands
             }
             activeVoiceChannel = null;
             audioOutStream = null;
+            audioQueue = new Queue<string[]>();
             await audioClient.StopAsync();
         }
 
