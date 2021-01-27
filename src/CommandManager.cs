@@ -35,35 +35,6 @@ namespace wowwowwow
         public const string commandIdentifier = "!wow";
         public const string pointerToHelpText = "\nTo view a list of commands, use `!wow help`";
 
-
-        public string helpText = string.Join(Environment.NewLine,
-        new string[]
-        {
-            "Main Commands:",
-            " - `!wow help`",
-            " - `!wow reload`",
-            " - `!wow echo`",
-            " - `!wow pause <minutes>`",
-
-            "\n(TODO) Voice Channel Commands",
-            " - `!wow vc join <channel>`",
-            " - `!wow vc leave <channel>`",
-            " - `!wow vc add <url>`",
-            " - `!wow vc skip`",
-
-            "\nKeyword Commands:",
-            " - `!wow keyword list`",
-            " - `!wow keyword add \"<keyword>\" \"*<optional:image> <value>\"`",
-            " - `!wow keyword remove \"<keyword>\"`",
-            " - `!wow keyword edit \"<keyword>\" \"<optional:image> <value>\"`",
-
-            "\nConfiguration Commands:",
-            " - `!wow config ignore <user> <true/false>`",
-            " - `!wow config react_to_delete <true/false>`",
-            " - `!wow config quiet_mode <true/false>`",
-            " - `!wow config reset`"
-        });
-
         public async Task Execute(SocketMessage command)
         {
             // remove extra whitespace

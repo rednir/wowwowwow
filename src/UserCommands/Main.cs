@@ -7,9 +7,39 @@ namespace wowwowwow.UserCommands
     public class Main : UserCommands
     {
 
+        private string helpText = string.Join(Environment.NewLine,
+        new string[]
+        {
+            "Main Commands:",
+            " - `!wow help`",
+            " - `!wow reload`",
+            " - `!wow echo`",
+            " - `!wow pause <minutes>`",
+
+            "\nVoice Channel Commands",
+            " - `!wow vc join`",
+            " - `!wow vc leave`",
+            " - `!wow vc add \"<url/search>\"`",
+            " - `!wow vc list`",
+            " - `!wow vc skip` (todo)",
+
+            "\nKeyword Commands:",
+            " - `!wow keyword list`",
+            " - `!wow keyword add \"<keyword>\" \"*<optional:image> <value>\"`",
+            " - `!wow keyword remove \"<keyword>\"`",
+            " - `!wow keyword edit \"<keyword>\" \"<optional:image> <value>\"`",
+
+            "\nConfiguration Commands:",
+            " - `!wow config ignore <user> <true/false>`",
+            " - `!wow config react_to_delete <true/false>`",
+            " - `!wow config quiet_mode <true/false>` (todo)",
+            " - `!wow config reset <config/keywords/all>`"
+        });
+
+
         public async Task Help()
         {
-            await verboseManager.SendEmbedMessage(embedMessage.Info(commandManager.helpText));
+            await verboseManager.SendEmbedMessage(embedMessage.Info(helpText));
         }
 
         public async Task Reload()
