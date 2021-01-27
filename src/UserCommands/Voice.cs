@@ -18,7 +18,7 @@ namespace wowwowwow.UserCommands
     {
         public static IAudioClient audioClient;
 
-        public static string downloadFilePath = "/tmp/wowwowwow-vc.opus";
+        public static string downloadFilePath = "/tmp/wowwowwow-vc.m4a";
 
         private Process CreateStream(string path)
         {
@@ -38,11 +38,11 @@ namespace wowwowwow.UserCommands
                 process.StartInfo.FileName = "bash";
                 if (isUrl)
                 {
-                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl \'{input}\' --no-playlist -x -o {downloadFilePath}\"";
+                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl \'{input}\' --no-playlist --audio-quality 7 --audio-format \'m4a\' -x -o {downloadFilePath}\"";
                 }
                 else
                 {
-                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl ytsearch:\'{input}\' --no-playlist -x -o {downloadFilePath}\"";
+                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl ytsearch:\'{input}\' --no-playlist --audio-quality 7 --audio-format \'m4a\' -x -o {downloadFilePath}\"";
                 }
                 process.StartInfo.UseShellExecute = false;
                 //process.StartInfo.RedirectStandardOutput = true;
