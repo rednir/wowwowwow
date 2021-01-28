@@ -123,16 +123,16 @@ namespace wowwowwow
             {
                 switch (currentCommand.split[2])
                 {
-                    case "join":
-                        await voiceCommands.Join((currentCommand.message.Author as IVoiceState).VoiceChannel);
+                    case "add":
+                        await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3], currentCommand.message.Author);
                         return;
-                    
+
                     case "leave":
                         await voiceCommands.Leave();
                         return;
-
-                    case "add":
-                        await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3], currentCommand.message.Author);
+                    
+                    case "list":
+                        await voiceCommands.List();
                         return;
 
                     case "skip":

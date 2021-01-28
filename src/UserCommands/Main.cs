@@ -17,11 +17,10 @@ namespace wowwowwow.UserCommands
             " - `!wow pause <minutes>`",
 
             "\nVoice Channel Commands",
-            " - `!wow vc join`",
-            " - `!wow vc leave`",
             " - `!wow vc add \"<url/search>\"`",
+            " - `!wow vc leave`",
             " - `!wow vc list`",
-            " - `!wow vc skip` (todo)",
+            " - `!wow vc skip`",
 
             "\nKeyword Commands:",
             " - `!wow keyword list`",

@@ -95,6 +95,8 @@ namespace wowwowwow
             public LogSeverity logSeverity { get; set; } = new LogSeverity();
             public string logSource { get; set; }
 
+
+
             public EmbedMessage Error(string toBeDescription)
             {
                 return new EmbedMessage() { title = "Error", description = toBeDescription, color = Color.Red };
@@ -111,11 +113,14 @@ namespace wowwowwow
             {
                 return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default, timeUntilDelete = 15000, logSeverity = toBeLogSeverity, logSource = toBeLogSource };
             }
-            public EmbedMessage KeywordResponse(string toBeDescription, bool toBeImage = false)
+            public EmbedMessage KeywordResponse(string toBeDescription, bool isToBeImage = false)
             {
-                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = toBeImage, isThereDeleteOption = true };
+                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = isToBeImage, isThereDeleteOption = true };
             }
-
+            public EmbedMessage NowPlaying(string toBeTitle, string toBeImage = "")
+            {
+                return new EmbedMessage() { title = toBeTitle, description = toBeImage, color = Color.LightGrey, isImage = toBeImage == "" ? false : true};
+            }
             public EmbedMessage Progress(string toBeDescription)
             {
                 return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default, isLoading = true};

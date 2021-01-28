@@ -24,6 +24,7 @@ namespace wowwowwow.UserCommands
 
         private static bool IsCurrentlyDownloading = false;
         public static string downloadFilePath = "/tmp/wowwowwow-vc.m4a";
+        public static string downloadThumbnailPath = "/tmp/wowwowwow-vc.thumbnail";
 
 
         private Process CreateStream(string path)
@@ -44,11 +45,11 @@ namespace wowwowwow.UserCommands
                 process.StartInfo.FileName = "bash";
                 if (isUrl)
                 {
-                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl \'{input}\' --no-playlist --audio-quality 7 --audio-format \'m4a\' -x -o {downloadFilePath}\"";
+                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl \'{input}\' --no-playlist --audio-format \'m4a\' -x -o {downloadFilePath} && youtube-dl \'{input}\' --get-thumbnail > {downloadThumbnailPath}\"";
                 }
                 else
                 {
-                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl ytsearch:\'{input}\' --no-playlist --audio-quality 7 --audio-format \'m4a\' -x -o {downloadFilePath}\"";
+                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl ytsearch:\'{input}\' --no-playlist --audio-format \'m4a\' -x -o {downloadFilePath} && youtube-dl ytsearch:\'{input}\' --get-thumbnail > {downloadThumbnailPath}\"";
                 }
                 process.StartInfo.UseShellExecute = false;
                 //process.StartInfo.RedirectStandardOutput = true;
@@ -93,20 +94,16 @@ namespace wowwowwow.UserCommands
 
             try
             {
-                Console.Write($"aaaaaaaaaaaaaaaaaaaaa LEAVING IN CONTINUE() {audioQueue.Count} {Program._client.GetUser(Convert.ToUInt64(audioQueue.Peek()[1]))}\n");
                 SocketUser user = Program._client.GetUser(Convert.ToUInt64(audioQueue.Peek()[1]));
-                //activeVoiceChannel = (user as IGuildUser).VoiceChannel;
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is FormatException)
             {
-
                 await Leave(string.Empty);
                 return;
             }
-            Console.WriteLine($"---- activeVoiceChannel = {activeVoiceChannel}\n--\n");
-            if (await Download())
+
+            if (await Download() && await Join(activeVoiceChannel))
             {
-                await Join(activeVoiceChannel);
                 await Play();
             }
 
@@ -115,6 +112,11 @@ namespace wowwowwow.UserCommands
 
         private async Task Play()
         {
+            string[] thumbnailUrl = await File.ReadAllLinesAsync(downloadThumbnailPath);
+            await verboseManager.SendEmbedMessage(embedMessage.NowPlaying($"▶️  Now playing:", thumbnailUrl[0]));
+
+            audioQueue.Dequeue();
+            
             using (var ffmpeg = CreateStream(downloadFilePath))
             using (audioOutStream = audioClient.CreatePCMStream(AudioApplication.Music))
             {
@@ -125,7 +127,6 @@ namespace wowwowwow.UserCommands
                 finally
                 {
                     audioOutStream = null;
-                    audioQueue.Dequeue();
                 }
             }
 
@@ -169,19 +170,15 @@ namespace wowwowwow.UserCommands
 
         // doesnt work if called from command, fix this or rework.
         // todo: this shouldnt need a bool return after error handle rework
-        public async Task<bool> Join(IVoiceChannel vc = null)
+        private async Task<bool> Join(IVoiceChannel vc = null)
         {
-            Console.WriteLine($"vc = {vc}\nactivevc= {activeVoiceChannel}\n--\n");
             if (vc == null)
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error("You must join a voice channel first before summoning the bot"));
                 return false;
             }
-            //await Task.Delay(500);
             activeVoiceChannel = vc;
-            Console.WriteLine("AUDIO CLIENT CREATED\n--\n");
             audioClient = await vc.ConnectAsync();
-
             return true;
         }
 
@@ -213,13 +210,35 @@ namespace wowwowwow.UserCommands
             {
                 // if nothing is playing, then download and play
                 activeVoiceChannel = (user as IGuildUser).VoiceChannel;
-                Console.WriteLine($"activeVoiceChannel = {activeVoiceChannel}\n--\n");
                 await Continue();
             }
             else
             {
                 activeVoiceChannel = (user as IGuildUser).VoiceChannel;
             }
+        }
+
+
+        public async Task List()
+        {
+            if (audioQueue.Count == 0)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Info("Nothing in the queue yet!\nUse `!wow vc add <url/search>` to add audio."));
+                return;
+            }
+            string[][] arrayOfAudioQueue = audioQueue.ToArray();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < arrayOfAudioQueue.Length; i++)
+            {
+                var currentItem = (arrayOfAudioQueue[i][0].StartsWith("http") ? arrayOfAudioQueue[i][0] : $"Search for: `{arrayOfAudioQueue[i][0]}`");
+                if (i == 0)
+                {
+                    sb.Append($"**Now Playing:**\n {currentItem}\n\n");
+                    continue;
+                }
+                sb.Append($"  {i + 1}) {currentItem}\n");
+            }
+            await verboseManager.SendEmbedMessage(embedMessage.Info(sb.ToString()));
         }
 
 
