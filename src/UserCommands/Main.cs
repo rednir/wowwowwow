@@ -18,8 +18,8 @@ namespace wowwowwow.UserCommands
 
             "\nVoice Channel Commands",
             " - `!wow vc add \"<url/search>\"`",
-            " - `!wow vc leave`",
-            " - `!wow vc list`",
+            " - `!wow vc clear`",
+            " - `!wow vc queue`",
             " - `!wow vc skip`",
 
             "\nKeyword Commands:",
