@@ -45,16 +45,6 @@ namespace wowwowwow
                 }
             }
 
-            if (!string.IsNullOrEmpty(message.url))
-            {
-                embed.WithUrl(message.url);
-            }
-
-            if (message.logSeverity != new LogSeverity())
-            {
-                embed.WithTitle($"{message.logSource} {message.logSeverity}");
-            }
-
             if (message.isThereDeleteOption && DataManager.config["reactToDelete"])
             {
                 embed.WithFooter($"ᴵˢ ᵗʰᶦˢ ᵐᵉˢˢᵃᵍᵉ ᵃⁿⁿᵒʸᶦⁿᵍˀ ᴿᵉᵃᶜᵗ ᵗᵒ ᵈᵉˡᵉᵗᵉ ᶦᵗᵎ");
@@ -63,6 +53,21 @@ namespace wowwowwow
                 var messageWithDeleteOption = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
                 await messageWithDeleteOption.AddReactionAsync(new Emoji(Program.deleteReactionText));
                 return messageWithDeleteOption;
+            }
+
+            if (!string.IsNullOrEmpty(message.url))
+            {
+                embed.WithUrl(message.url);
+            }
+
+            if (!string.IsNullOrEmpty(message.footer))
+            {
+                embed.WithFooter(message.footer);
+            }
+
+            if (message.logSeverity != new LogSeverity())
+            {
+                embed.WithTitle($"{message.logSource} {message.logSeverity}");
             }
 
             if (message.timeUntilDelete > 0)
@@ -81,7 +86,7 @@ namespace wowwowwow
             }
 
             Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"sendEmbedMessage ({message.title}: {message.description})").ToString());
-            
+
             embed.WithDescription(message.description);
             return await Program.lastChannel.SendMessageAsync("", false, embed.Build());
         }
@@ -91,6 +96,7 @@ namespace wowwowwow
 
             public string title { get; set; }
             public string description { get; set; }
+            public string footer { get; set; }
             public Color color { get; set; }
             public string url { get; set; }
             public bool isThereDeleteOption { get; set; }
@@ -123,13 +129,13 @@ namespace wowwowwow
             {
                 return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = isToBeImage, isThereDeleteOption = true };
             }
-            public EmbedMessage NowPlaying(string toBeTitle, string toBeUrl, string toBeDescription, string toBeImage = "")
+            public EmbedMessage NowPlaying(string toBeTitle, string toBeUrl, string toBeDescription, string toBeFooter, string toBeImage = "")
             {
-                return new EmbedMessage() { title = toBeTitle, url = toBeUrl, description = $"{toBeImage} {toBeDescription}", color = Color.LightGrey, isImage = toBeImage == "" ? false : true};
+                return new EmbedMessage() { title = toBeTitle, url = toBeUrl, description = $"{toBeImage} {toBeDescription}", footer = toBeFooter, color = Color.LightGrey, isImage = (toBeImage != "") };
             }
             public EmbedMessage Progress(string toBeDescription)
             {
-                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default, isLoading = true};
+                return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default, isLoading = true };
             }
 
 

@@ -22,7 +22,6 @@ namespace wowwowwow.UserCommands
         AudioOutStream audioOutStream = null;
         private static Queue<object[]> audioQueue = new Queue<object[]>();    // [0] should be string, [1] should be SocketUser, [2] should be IVoiceChannel
         private static IVoiceChannel activeVoiceChannel = null;
-
         private static bool isCurrentlyDownloading = false;
         public static string downloadFilePath = "/tmp/wowwowwow-vc.opus";
         public static string downloadMetadataPath = $"{downloadFilePath}.info.json";
@@ -33,6 +32,9 @@ namespace wowwowwow.UserCommands
             public string title { get; set; }
             public string webpage_url { get; set; }
             public string description { get; set; }
+            public int view_count { get; set; }
+            public int like_count { get; set; }
+            public int dislike_count { get; set; }
             public List<MetadataThumbnails> thumbnails { get; set; }
 
         }
@@ -65,18 +67,19 @@ namespace wowwowwow.UserCommands
                 process.StartInfo.FileName = "bash";
                 if (isUrl)
                 {
-                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl \'{input}\' --print-json -f worst --no-playlist --audio-format \'opus\' -x -o {downloadFilePath} > {downloadMetadataPath}\"";
+                    process.StartInfo.Arguments = $"-c \"rm \'{downloadFilePath}\'; youtube-dl \'{input}\' --no-warnings --match-filter \"!is_live\" --print-json -f worstaudio --max-filesize 512m --no-playlist --audio-format \'opus\' -x -o {downloadFilePath} > {downloadMetadataPath}\"";
                 }
                 else
                 {
-                    process.StartInfo.Arguments = $"-c \" rm \'{downloadFilePath}\'; youtube-dl ytsearch:\'{input}\' --print-json -f worst --no-playlist --audio-format \'opus\' -x -o {downloadFilePath} > {downloadMetadataPath}\"";
+                    process.StartInfo.Arguments = $"-c \"rm \'{downloadFilePath}\'; youtube-dl ytsearch:\'{input}\' --no-warnings --match-filter \"!is_live\" --print-json -f worstaudio --max-filesize 512m --no-playlist --audio-format \'opus\' -x -o {downloadFilePath} > {downloadMetadataPath}\"";
                 }
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardError = true;
                 process.Start();
 
-                StreamReader reader = process.StandardError;
-                string output = reader.ReadLine();
+
+                StreamReader errorReader = process.StandardError;
+                string error = errorReader.ReadLine();
 
                 process.WaitForExit();
                 if (process.ExitCode == 0)
@@ -85,7 +88,7 @@ namespace wowwowwow.UserCommands
                 }
                 else
                 {
-                    return output;
+                    return error;
                 }
             }
         }
@@ -124,6 +127,7 @@ namespace wowwowwow.UserCommands
 
             if (await Download() && await Join())
             {
+                audioQueue.Dequeue();
                 await Play();
             }
 
@@ -133,7 +137,6 @@ namespace wowwowwow.UserCommands
         private async Task Play()
         {
             await NowPlaying();
-            audioQueue.Dequeue();
 
             using (var ffmpeg = CreateStream(downloadFilePath))
             using (audioOutStream = audioClient.CreatePCMStream(AudioApplication.Music))
@@ -173,12 +176,14 @@ namespace wowwowwow.UserCommands
                 await LeaveBeforeReJoin();
 
                 RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress("Downloading..."));
-                string output = YoutubeDl(toPlay, toPlay.StartsWith("http") ? true : false);
+                string output = YoutubeDl(toPlay, toPlay.StartsWith("http"));
                 await downloadingMessage.DeleteAsync();
+
                 if (output != string.Empty)
                 {
                     await verboseManager.SendEmbedMessage(embedMessage.Warning($"An error was returned when downloading the audio file:```{output}```This may or may not be fatal."));
                 }
+
                 return true;
             }
             finally
@@ -216,22 +221,16 @@ namespace wowwowwow.UserCommands
 
         public async Task NowPlaying()
         {
-            const int maxDescriptionLength = 300;
-            try
-            {
-                var metadata = JsonSerializer.Deserialize<Metadata>(File.ReadAllText(downloadMetadataPath));
-                Console.WriteLine(metadata.description);
-                // the long ternary operator here just shrinks the description if it's over maxDescriptionLength
-                await verboseManager.SendEmbedMessage(embedMessage.NowPlaying($"▶️  Now playing: \n{(metadata.title)} ", metadata.webpage_url, $"{(metadata.description.Length > maxDescriptionLength ? $"{metadata.description.Substring(0, maxDescriptionLength - 3)}..." : metadata.description )}", metadata.thumbnails[2].url));
-            }
-            catch (Exception ex)
-            {
-                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{ex}"));
-            }
+            const int maxDescriptionLength = 350;
+
+            var metadata = JsonSerializer.Deserialize<Metadata>(File.ReadAllText(downloadMetadataPath));
+            Console.WriteLine(metadata.description);
+            // the long ternary operator here just shrinks the description if it's over maxDescriptionLength
+            await verboseManager.SendEmbedMessage(embedMessage.NowPlaying($"▶️  Now playing: \n{(metadata.title)} ", metadata.webpage_url, $"{(metadata.description.Length > maxDescriptionLength ? $"{metadata.description.Substring(0, maxDescriptionLength - 3)}..." : metadata.description)}", $"👁️ {metadata.view_count}      |      👍 {metadata.like_count}      |      👎 {metadata.dislike_count}", metadata.thumbnails[2].url));
         }
 
 
-        // todo: this suffers from baed error handling
+        // todo: this suffers from bad error handling
         public async Task Add(string toPlay, SocketUser user)
         {
             IGuildUser guildUser = (user as IGuildUser);
@@ -271,7 +270,7 @@ namespace wowwowwow.UserCommands
                 string currentItemFormatted = (currentItem.StartsWith("http") ? currentItem : $"Search for: `{currentItem}`");
                 if (i == 0)
                 {
-                    sb.Append($"**Now Playing:**\n {currentItem}\n\n");
+                    sb.Append($"**Up next:**\n {currentItem}\n\n");
                     continue;
                 }
                 sb.Append($"  {i + 1}) {currentItem}\n");

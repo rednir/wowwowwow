@@ -123,6 +123,7 @@ namespace wowwowwow
             {
                 switch (currentCommand.split[2])
                 {
+
                     case "add":
                         await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3], currentCommand.message.Author);
                         return;
