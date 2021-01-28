@@ -27,14 +27,15 @@ namespace wowwowwow.UserCommands
         public static string downloadMetadataPath = $"{downloadFilePath}.info.json";
 
 
+        // type dynamic is used when value can be null, or serializing will return an error
         private class Metadata
         {
             public string title { get; set; }
             public string webpage_url { get; set; }
             public string description { get; set; }
-            public int view_count { get; set; }
-            public int like_count { get; set; }
-            public int dislike_count { get; set; }
+            public dynamic view_count { get; set; }
+            public dynamic like_count { get; set; }
+            public dynamic dislike_count { get; set; }
             public List<MetadataThumbnails> thumbnails { get; set; }
 
         }
@@ -221,12 +222,12 @@ namespace wowwowwow.UserCommands
 
         public async Task NowPlaying()
         {
-            const int maxDescriptionLength = 350;
+            const int maxDescriptionLength = 1000;
 
             var metadata = JsonSerializer.Deserialize<Metadata>(File.ReadAllText(downloadMetadataPath));
             Console.WriteLine(metadata.description);
             // the long ternary operator here just shrinks the description if it's over maxDescriptionLength
-            await verboseManager.SendEmbedMessage(embedMessage.NowPlaying($"▶️  Now playing: \n{(metadata.title)} ", metadata.webpage_url, $"{(metadata.description.Length > maxDescriptionLength ? $"{metadata.description.Substring(0, maxDescriptionLength - 3)}..." : metadata.description)}", $"👁️ {metadata.view_count}      |      👍 {metadata.like_count}      |      👎 {metadata.dislike_count}", metadata.thumbnails[2].url));
+            await verboseManager.SendEmbedMessage(embedMessage.NowPlaying($"▶️  Now playing: \n{(metadata.title)} ", metadata.webpage_url, $"*{(metadata.description.Length > maxDescriptionLength ? $"{metadata.description.Substring(0, maxDescriptionLength - 3)}..." : metadata.description)} *", $"👁️  {metadata.view_count ?? 0}      |      👍  {metadata.like_count ?? 0}      |      👎  {metadata.dislike_count ?? 0}", metadata.thumbnails[2].url));
         }
 
 
