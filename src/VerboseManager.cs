@@ -45,6 +45,11 @@ namespace wowwowwow
                 }
             }
 
+            if (!string.IsNullOrEmpty(message.url))
+            {
+                embed.WithUrl(message.url);
+            }
+
             if (message.logSeverity != new LogSeverity())
             {
                 embed.WithTitle($"{message.logSource} {message.logSeverity}");
@@ -87,6 +92,7 @@ namespace wowwowwow
             public string title { get; set; }
             public string description { get; set; }
             public Color color { get; set; }
+            public string url { get; set; }
             public bool isThereDeleteOption { get; set; }
             public int timeUntilDelete { get; set; }
             public bool isImage { get; set; }
@@ -117,9 +123,9 @@ namespace wowwowwow
             {
                 return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = isToBeImage, isThereDeleteOption = true };
             }
-            public EmbedMessage NowPlaying(string toBeTitle, string toBeImage = "")
+            public EmbedMessage NowPlaying(string toBeTitle, string toBeUrl, string toBeDescription, string toBeImage = "")
             {
-                return new EmbedMessage() { title = toBeTitle, description = toBeImage, color = Color.LightGrey, isImage = toBeImage == "" ? false : true};
+                return new EmbedMessage() { title = toBeTitle, url = toBeUrl, description = $"{toBeImage} {toBeDescription}", color = Color.LightGrey, isImage = toBeImage == "" ? false : true};
             }
             public EmbedMessage Progress(string toBeDescription)
             {
