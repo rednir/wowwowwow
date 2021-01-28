@@ -122,7 +122,7 @@ namespace wowwowwow.UserCommands
             catch (Exception ex) when (ex is InvalidOperationException || ex is FormatException)    // i dont think i need FormatException anymore
             {
                 Console.WriteLine(ex); // temp
-                await Clear(string.Empty);
+                await Leave(string.Empty);
                 return;
             }
 
@@ -171,12 +171,12 @@ namespace wowwowwow.UserCommands
                 catch (InvalidOperationException ex)
                 {
                     Console.WriteLine(ex); // temp
-                    await Clear(string.Empty);
+                    await Leave(string.Empty);
                     return false;
                 }
                 await LeaveBeforeReJoin();
 
-                RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress("Downloading..."));
+                RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress($"About to play {(audioQueue.Peek()[1] as SocketUser).Username}'s request..."));
                 string output = YoutubeDl(toPlay, toPlay.StartsWith("http"));
                 await downloadingMessage.DeleteAsync();
 
@@ -202,7 +202,7 @@ namespace wowwowwow.UserCommands
         }
 
 
-        public async Task Clear(string message = "The bot has been disconnected from the voice channel and the queue has been cleared.")
+        public async Task Leave(string message = "The bot has been disconnected from the voice channel and the queue has been cleared.")
         {
             if (activeVoiceChannel == null)
             {

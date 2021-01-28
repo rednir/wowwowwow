@@ -128,8 +128,8 @@ namespace wowwowwow
                         await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3], currentCommand.message.Author);
                         return;
 
-                    case "clear":
-                        await voiceCommands.Clear();
+                    case "leave":
+                        await voiceCommands.Leave();
                         return;
                     
                     case "queue":

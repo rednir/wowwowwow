@@ -18,7 +18,7 @@ namespace wowwowwow.UserCommands
 
             "\nVoice Channel Commands",
             " - `!wow vc add \"<url/search>\"`",
-            " - `!wow vc clear`",
+            " - `!wow vc leave`",
             " - `!wow vc queue`",
             " - `!wow vc skip`",
 
@@ -32,7 +32,9 @@ namespace wowwowwow.UserCommands
             " - `!wow config ignore <user> <true/false>`",
             " - `!wow config react_to_delete <true/false>`",
             " - `!wow config quiet_mode <true/false>` (todo)",
-            " - `!wow config reset <config/keywords/all>`"
+            " - `!wow config reset <config/keywords/all>`",
+
+            "TODO: different audio client for different guilds, embed message should reply to author of user message that activated it"
         });
 
 
