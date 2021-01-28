@@ -55,6 +55,11 @@ namespace wowwowwow
                 return messageWithDeleteOption;
             }
 
+            if (!string.IsNullOrEmpty(message.author))
+            {
+                embed.WithAuthor(message.author);
+            }
+
             if (!string.IsNullOrEmpty(message.url))
             {
                 embed.WithUrl(message.url);
@@ -93,7 +98,7 @@ namespace wowwowwow
 
         public class EmbedMessage
         {
-
+            public string author { get; set; }
             public string title { get; set; }
             public string description { get; set; }
             public string footer { get; set; }
@@ -103,7 +108,6 @@ namespace wowwowwow
             public int timeUntilDelete { get; set; }
             public bool isImage { get; set; }
             public bool isLoading { get; set; }
-
             public LogSeverity logSeverity { get; set; } = new LogSeverity();
             public string logSource { get; set; }
 
@@ -129,9 +133,9 @@ namespace wowwowwow
             {
                 return new EmbedMessage() { title = "", description = toBeDescription, color = Color.LightGrey, isImage = isToBeImage, isThereDeleteOption = true };
             }
-            public EmbedMessage NowPlaying(string toBeTitle, string toBeUrl, string toBeDescription, string toBeFooter, string toBeImage = "")
+            public EmbedMessage NowPlaying(string toBeAuthor, string toBeTitle, string toBeUrl, string toBeDescription, string toBeFooter, string toBeImage = "")
             {
-                return new EmbedMessage() { title = toBeTitle, url = toBeUrl, description = $"{toBeImage} {toBeDescription}", footer = toBeFooter, color = Color.LightGrey, isImage = (toBeImage != "") };
+                return new EmbedMessage() { author = toBeAuthor, title = toBeTitle, url = toBeUrl, description = $"{toBeImage} {toBeDescription}", footer = toBeFooter, color = Color.LightGrey, isImage = (toBeImage != "") };
             }
             public EmbedMessage Progress(string toBeDescription)
             {

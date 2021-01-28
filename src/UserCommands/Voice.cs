@@ -222,12 +222,12 @@ namespace wowwowwow.UserCommands
 
         public async Task NowPlaying()
         {
-            const int maxDescriptionLength = 1000;
+            const int maxDescriptionLength = 350;
 
             var metadata = JsonSerializer.Deserialize<Metadata>(File.ReadAllText(downloadMetadataPath));
             Console.WriteLine(metadata.description);
             // the long ternary operator here just shrinks the description if it's over maxDescriptionLength
-            await verboseManager.SendEmbedMessage(embedMessage.NowPlaying($"▶️  Now playing: \n{(metadata.title)} ", metadata.webpage_url, $"*{(metadata.description.Length > maxDescriptionLength ? $"{metadata.description.Substring(0, maxDescriptionLength - 3)}..." : metadata.description)} *", $"👁️  {metadata.view_count ?? 0}      |      👍  {metadata.like_count ?? 0}      |      👎  {metadata.dislike_count ?? 0}", metadata.thumbnails[2].url));
+            await verboseManager.SendEmbedMessage(embedMessage.NowPlaying("▶️  Now playing: ", metadata.title, metadata.webpage_url, $"{(metadata.description.Length > maxDescriptionLength ? $"{metadata.description.Substring(0, maxDescriptionLength - 3)}..." : metadata.description)}", $"👁️  {metadata.view_count ?? 0}      |      👍  {metadata.like_count ?? 0}      |      👎  {metadata.dislike_count ?? 0}", metadata.thumbnails[2].url));
         }
 
 
