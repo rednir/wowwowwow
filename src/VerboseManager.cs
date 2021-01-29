@@ -116,15 +116,15 @@ namespace wowwowwow
 
             public EmbedMessage Error(string toBeDescription)
             {
-                return new EmbedMessage() { title = "Error", description = toBeDescription, color = Color.Red };
+                return new EmbedMessage() { title = $"{new Emoji("<:wowerror:804732656721199144>")}  Error", description = toBeDescription, color = Color.Red };
             }
             public EmbedMessage Warning(string toBeDescription)
             {
-                return new EmbedMessage() { title = "Warning", description = toBeDescription, color = Color.Orange };
+                return new EmbedMessage() { title = $"{new Emoji("<:wowwarning:804732632751407174>")}  Warning", description = toBeDescription, color = Color.Orange };
             }
             public EmbedMessage Info(string toBeDescription)
             {
-                return new EmbedMessage() { title = "Info", description = toBeDescription, color = Color.Blue };
+                return new EmbedMessage() { title = $"{new Emoji("<:wowinfo:804732580423008297>")}  Info", description = toBeDescription, color = Color.Blue };
             }
             public EmbedMessage Log(string toBeDescription, LogSeverity toBeLogSeverity, string toBeLogSource)
             {
