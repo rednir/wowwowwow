@@ -94,11 +94,11 @@ namespace wowwowwow
         {
             switch (currentCommand.split[1])
             {
-                case "help":
+                case "help": case "commands": case "list":
                     await mainCommands.Help();
                     return;
 
-                case "reload":
+                case "reload": case "refresh":
                     await mainCommands.Reload();
                     return;
 
@@ -124,19 +124,19 @@ namespace wowwowwow
                 switch (currentCommand.split[2])
                 {
 
-                    case "add":
+                    case "add": case "play":
                         await voiceCommands.Add(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3], currentCommand.message.Author);
                         return;
 
-                    case "leave":
+                    case "leave": case "clear": case "disconnect": case "stop":
                         await voiceCommands.Leave();
                         return;
                     
-                    case "queue":
+                    case "queue": case "list":
                         await voiceCommands.Queue();
                         return;
 
-                    case "skip":
+                    case "skip": case "next":
                         await voiceCommands.Skip();
                         return;
 
@@ -172,15 +172,15 @@ namespace wowwowwow
                         await keywordCommands.Add(currentCommand.parameters);
                         return;
 
-                    case "remove":
+                    case "remove": case "delete":
                         await keywordCommands.Remove(currentCommand.parameters);
                         return;
 
-                    case "edit":
+                    case "edit": case "change":
                         await keywordCommands.Edit(currentCommand.parameters);
                         return;
 
-                    case "list":
+                    case "list": case "all":
                         await keywordCommands.List();
                         return;
 
