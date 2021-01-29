@@ -91,12 +91,13 @@ namespace wowwowwow
             // only carry on if message is not command
             // todo: make this seperate method
             var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
-            if (DataManager.keywords.Count == 0)
+            if (foundKeywords ?? true)
             {
                 return;
             }
+            
             VerboseManager.lastChannel = recievedMessage.Channel;
-
+            Console.WriteLine($"changed last channel to = {recievedMessage.Channel}");
             if (DataManager.keywords[foundKeywords].StartsWith("http"))
             {
                 await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords], true));
