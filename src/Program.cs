@@ -84,20 +84,8 @@ namespace wowwowwow
             if (recievedMessage.Content.StartsWith(CommandManager.commandIdentifier))
             {
                 VerboseManager.lastChannel = recievedMessage.Channel;
-                if (recievedMessage.Content == CommandManager.commandIdentifier)
-                {
-                    await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
-                    return;
-                }
-
-                IGuild guildOfMessage = (recievedMessage.Channel as SocketGuildChannel).Guild;
-                if (!instancesOfCommandManager.ContainsKey(guildOfMessage))
-                {
-                    instancesOfCommandManager.Add(guildOfMessage, new CommandManager());
-                }
-                await instancesOfCommandManager[guildOfMessage].Execute(recievedMessage);
+                await CommandRecieved(recievedMessage);
                 return;
-                
             }
 
             // only carry on if message is not command
@@ -118,7 +106,22 @@ namespace wowwowwow
             await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords]));
         }
 
-
+        private async Task CommandRecieved(SocketMessage command)
+        {
+            if (command.Content == CommandManager.commandIdentifier)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
+                return;
+            }
+            
+            IGuild guildOfMessage = (command.Channel as SocketGuildChannel).Guild;
+            if (!instancesOfCommandManager.ContainsKey(guildOfMessage))
+            {
+                // create a new instance for a new guild
+                instancesOfCommandManager.Add(guildOfMessage, new CommandManager());
+            }
+            await instancesOfCommandManager[guildOfMessage].Execute(command);
+        }
 
 
         // todo: rewrite
