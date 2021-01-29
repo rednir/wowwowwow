@@ -18,13 +18,14 @@ namespace wowwowwow.UserCommands
 {
     public class Voice : UserCommands
     {
-        public static IAudioClient audioClient;
-        AudioOutStream audioOutStream = null;
-        private static Queue<object[]> audioQueue = new Queue<object[]>();    // [0] should be string, [1] should be SocketUser, [2] should be IVoiceChannel
-        private static IVoiceChannel activeVoiceChannel = null;
-        private static bool isCurrentlyDownloading = false;
         public static string downloadFilePath = "/tmp/wowwowwow-vc.opus";
         public static string downloadMetadataPath = $"{downloadFilePath}.info.json";
+
+        public IAudioClient audioClient;
+        AudioOutStream audioOutStream = null;
+        private Queue<object[]> audioQueue = new Queue<object[]>();    // [0] should be string, [1] should be SocketUser, [2] should be IVoiceChannel
+        private IVoiceChannel activeVoiceChannel = null;
+        private bool isCurrentlyDownloading = false;
 
 
         // type dynamic is used when value can be null, or serializing will return an error
