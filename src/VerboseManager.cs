@@ -14,6 +14,7 @@ namespace wowwowwow
     {
         // TODO: better error handling with throw
         private EmbedMessage embedMessage = new EmbedMessage();
+        public static ISocketMessageChannel lastChannel;
 
         public async Task Log(LogMessage msg)
         {
@@ -50,7 +51,7 @@ namespace wowwowwow
                 embed.WithFooter($"ᴵˢ ᵗʰᶦˢ ᵐᵉˢˢᵃᵍᵉ ᵃⁿⁿᵒʸᶦⁿᵍˀ ᴿᵉᵃᶜᵗ ᵗᵒ ᵈᵉˡᵉᵗᵉ ᶦᵗᵎ");
                 embed.WithDescription(message.description);
 
-                var messageWithDeleteOption = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
+                var messageWithDeleteOption = await VerboseManager.lastChannel.SendMessageAsync("", false, embed.Build());
                 await messageWithDeleteOption.AddReactionAsync(new Emoji(Program.deleteReactionText));
                 return messageWithDeleteOption;
             }
@@ -79,7 +80,7 @@ namespace wowwowwow
             {
                 embed.WithDescription(message.description);
                 embed.WithFooter($"This message will be deleted in {message.timeUntilDelete / 1000} seconds", "https://icons.iconarchive.com/icons/martz90/circle-addon2/256/warning-icon.png");
-                var messageToDelete = await Program.lastChannel.SendMessageAsync("", false, embed.Build());
+                var messageToDelete = await VerboseManager.lastChannel.SendMessageAsync("", false, embed.Build());
                 _ = Task.Delay(message.timeUntilDelete).ContinueWith((t) => messageToDelete.DeleteAsync());
                 return null;
             }
@@ -87,13 +88,13 @@ namespace wowwowwow
             if (message.isLoading)
             {
                 embed.WithFooter(message.description, "https://i.gifer.com/ZZ5H.gif");
-                return await Program.lastChannel.SendMessageAsync("", false, embed.Build());
+                return await VerboseManager.lastChannel.SendMessageAsync("", false, embed.Build());
             }
 
             Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"sendEmbedMessage ({message.title}: {message.description})").ToString());
 
             embed.WithDescription(message.description);
-            return await Program.lastChannel.SendMessageAsync("", false, embed.Build());
+            return await VerboseManager.lastChannel.SendMessageAsync("", false, embed.Build());
         }
 
         public class EmbedMessage

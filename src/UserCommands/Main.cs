@@ -34,7 +34,7 @@ namespace wowwowwow.UserCommands
             " - `!wow config quiet_mode <true/false>` (todo)",
             " - `!wow config reset <config/keywords/all>`",
 
-            "TODO: different audio client for different guilds, embed message should reply to author of user message that activated it"
+            "\nTODO: different audio client for different guilds, welcome text, "
         });
 
 

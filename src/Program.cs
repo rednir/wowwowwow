@@ -29,8 +29,6 @@ namespace wowwowwow
 
         public const LogSeverity logLevel = LogSeverity.Error;
 
-        public static ISocketMessageChannel lastChannel;
-
 
         public static void Main(string[] args)
         {
@@ -52,8 +50,8 @@ namespace wowwowwow
             _client.MessageReceived += MessageRecieved;
             _client.ReactionAdded += ReactionAdded;
             _client.Ready += Ready;
-            
-            
+
+
 
             await Task.Delay(-1);
         }
@@ -82,9 +80,10 @@ namespace wowwowwow
             {
                 return;
             }
-            lastChannel = recievedMessage.Channel;
+
             if (recievedMessage.Content.StartsWith(CommandManager.commandIdentifier))
             {
+                VerboseManager.lastChannel = recievedMessage.Channel;
                 if (recievedMessage.Content == CommandManager.commandIdentifier)
                 {
                     await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
@@ -97,16 +96,15 @@ namespace wowwowwow
             // only carry on if message is not command
             // todo: make this seperate method
             var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
-            try
+            if (DataManager.keywords.Count == 0)
             {
-                if (DataManager.keywords[foundKeywords].StartsWith("http"))
-                {
-                    await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords], true));
-                    return;
-                }
+                return;
             }
-            catch (ArgumentNullException)
+            VerboseManager.lastChannel = recievedMessage.Channel;
+
+            if (DataManager.keywords[foundKeywords].StartsWith("http"))
             {
+                await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords], true));
                 return;
             }
 
