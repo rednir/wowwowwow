@@ -23,7 +23,7 @@ namespace wowwowwow
         public static bool isBotPaused = false;
 
         private DataManager dataManager = new DataManager();
-        private CommandManager commandManager = new CommandManager();
+        private Dictionary<IGuild, CommandManager> instancesOfCommandManager = new Dictionary<IGuild, CommandManager>();
         private VerboseManager verboseManager = new VerboseManager();
         private VerboseManager.EmbedMessage embedMessage = new VerboseManager.EmbedMessage();
 
@@ -89,8 +89,15 @@ namespace wowwowwow
                     await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
                     return;
                 }
-                await commandManager.Execute(recievedMessage);
+
+                IGuild guildOfMessage = (recievedMessage.Channel as SocketGuildChannel).Guild;
+                if (!instancesOfCommandManager.ContainsKey(guildOfMessage))
+                {
+                    instancesOfCommandManager.Add(guildOfMessage, new CommandManager());
+                }
+                await instancesOfCommandManager[guildOfMessage].Execute(recievedMessage);
                 return;
+                
             }
 
             // only carry on if message is not command

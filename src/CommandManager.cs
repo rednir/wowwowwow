@@ -19,14 +19,14 @@ namespace wowwowwow
         private class Command
         {
             public SocketMessage message { get; set; }
-            public IGuild guild { get; set; }
+            //public IGuild guild { get; set; }
             public string[] split { get; set; }
             public List<string> parameters { get; set; }
         }
 
 
         private UserCommands.Main mainCommands = new UserCommands.Main();
-        private Dictionary<IGuild, UserCommands.Voice> instancesOfVoiceCommands = new Dictionary<IGuild ,UserCommands.Voice>();
+        private UserCommands.Voice voiceCommands = new UserCommands.Voice();
         private UserCommands.Keyword keywordCommands = new UserCommands.Keyword();
         private UserCommands.Config configCommands = new UserCommands.Config();
 
@@ -45,7 +45,7 @@ namespace wowwowwow
             currentCommand = new Command()
             {
                 message = command,
-                guild = (command.Channel as SocketGuildChannel).Guild,
+                //guild = (command.Channel as SocketGuildChannel).Guild,
                 split = regex.Replace(command.Content, " ").Split(" "),
                 parameters = new List<string>()
             };
@@ -125,11 +125,11 @@ namespace wowwowwow
             try
             {
                 // each guild has its own instance of VoiceCommands
-                if (!instancesOfVoiceCommands.ContainsKey(currentCommand.guild))
+                /*if (!instancesOfVoiceCommands.ContainsKey(currentCommand.guild))
                 {
                     instancesOfVoiceCommands.Add(currentCommand.guild, new UserCommands.Voice());
                 }
-                UserCommands.Voice voiceCommands = instancesOfVoiceCommands[currentCommand.guild];
+                UserCommands.Voice voiceCommands = instancesOfVoiceCommands[currentCommand.guild];*/
                         
                 switch (currentCommand.split[2])
                 {
