@@ -91,11 +91,11 @@ namespace wowwowwow
             // only carry on if message is not command
             // todo: make this seperate method
             var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
-            if (foundKeywords ?? true)
+            if (foundKeywords is null)
             {
                 return;
             }
-            
+
             VerboseManager.lastChannel = recievedMessage.Channel;
             Console.WriteLine($"changed last channel to = {recievedMessage.Channel}");
             if (DataManager.keywords[foundKeywords].StartsWith("http"))
@@ -114,7 +114,7 @@ namespace wowwowwow
                 await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
                 return;
             }
-            
+
             IGuild guildOfMessage = (command.Channel as SocketGuildChannel).Guild;
             if (!instancesOfCommandManager.ContainsKey(guildOfMessage))
             {
@@ -128,37 +128,35 @@ namespace wowwowwow
         // todo: rewrite
         private dynamic CheckStringForKeyword(string s)
         {
+
             List<string> listOfKeywords = new List<string>();
             string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
+            stringToSearch = new StringBuilder().Append(" ").Insert(0, "").ToString();  // this is used to stop errors occuring when checking whether the keyword found is part of another word
 
             foreach (var k in DataManager.keywords.Keys)
             {
                 string keyword = k.ToLower();
-                if (stringToSearch.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                if (stringToSearch.Contains(keyword))
                 {
                     // prioritize exact matches
                     if (keyword == stringToSearch)
                     {
                         listOfKeywords.Add(keyword);
                         listOfKeywords.RemoveAll((x) => x != keyword);
-                        break;
+                        return listOfKeywords.Max();
+
                     }
                     else if (stringToSearch.Contains(keyword))
                     {
-                        // check if the keyword is not part of another word (check if whitespace in front and behind)
-                        try
-                        {
-                            if (stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length] == ' ' && stringToSearch[stringToSearch.IndexOf(keyword) - 1] == ' ')
-                            {
-                                listOfKeywords.Add(keyword);
-                            }
-                        }
-                        catch (IndexOutOfRangeException)
+                        // check if the keyword found is not part of another word (check if whitespace in front and behind)
+                        if (char.IsWhiteSpace(stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length]) && char.IsWhiteSpace(stringToSearch[stringToSearch.IndexOf(keyword) - 1]))
                         {
                             listOfKeywords.Add(keyword);
                         }
                     }
+                    
                 }
+
             }
 
             return listOfKeywords.Max();
