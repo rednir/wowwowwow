@@ -28,13 +28,23 @@ namespace wowwowwow.UserCommands
             " - `!wow keyword remove \"<keyword>\"`",
             " - `!wow keyword edit \"<keyword>\" \"<optional:image> <value>\"`",
 
+            "\nGeometry Dash Commands: (todo)",
+            " - `!wow gd search <user/level> <search>`",
+            " - `!wow gd daily",
+            " - `!wow gd weekly`",
+            " - `!wow gd top10`",
+
+            "\nMisc commands",
+            " - `!wow misc count`",
+            " - `!wow misc pfp`",
+
             "\nConfiguration Commands:",
             " - `!wow config ignore <user> <true/false>`",
             " - `!wow config react_to_delete <true/false>`",
             " - `!wow config quiet_mode <true/false>` (todo)",
             " - `!wow config reset <config/keywords/all>`",
 
-            "\nTODO: different audio client for different guilds, welcome text, "
+            "\nTODO: welcome text, different datamanager for different guilds, hardcoded perms with refresh, pause "
         });
 
 

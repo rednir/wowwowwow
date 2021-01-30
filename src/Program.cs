@@ -131,7 +131,7 @@ namespace wowwowwow
 
             List<string> listOfKeywords = new List<string>();
             string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
-            stringToSearch = new StringBuilder().Append(" ").Insert(0, "").ToString();  // this is used to stop errors occuring when checking whether the keyword found is part of another word
+            stringToSearch = new StringBuilder(stringToSearch).Append(" ").Insert(0, " ").ToString();  // this is used to stop errors occuring when checking whether the keyword found is part of another word
 
             foreach (var k in DataManager.keywords.Keys)
             {
