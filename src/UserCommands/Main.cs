@@ -30,7 +30,7 @@ namespace wowwowwow.UserCommands
 
             "\nGeometry Dash Commands: (todo)",
             " - `!wow gd search <user/level> <search>`",
-            " - `!wow gd daily",
+            " - `!wow gd daily`",
             " - `!wow gd weekly`",
             " - `!wow gd top10`",
 

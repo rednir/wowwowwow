@@ -68,7 +68,7 @@ namespace wowwowwow
             var message = await cachedMessage.GetOrDownloadAsync();
             if (message.Author.Id == botAccountID && reaction.UserId != botAccountID && reaction.Emote.Name == deleteReactionText)
             {
-                Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"ReactionAdded (Delete by: {reaction.User})").ToString());
+                Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"ReactionAdded (Delete by: {reaction.User} / {reaction.UserId})").ToString());
                 await message.DeleteAsync();
             }
         }
@@ -100,11 +100,11 @@ namespace wowwowwow
             Console.WriteLine($"changed last channel to = {recievedMessage.Channel}");
             if (DataManager.keywords[foundKeywords].StartsWith("http"))
             {
-                await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords], true));
+                await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords], true));
                 return;
             }
 
-            await verboseManager.SendEmbedMessage(embedMessage.KeywordResponse(DataManager.keywords[foundKeywords]));
+            await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords]));
         }
 
         private async Task CommandRecieved(SocketMessage command)

@@ -28,6 +28,7 @@ namespace wowwowwow
         private UserCommands.Main mainCommands = new UserCommands.Main();
         private UserCommands.Voice voiceCommands = new UserCommands.Voice();
         private UserCommands.Keyword keywordCommands = new UserCommands.Keyword();
+        private UserCommands.Misc miscCommands = new UserCommands.Misc();
         private UserCommands.Config configCommands = new UserCommands.Config();
 
 
@@ -74,6 +75,10 @@ namespace wowwowwow
 
                     case "keyword":
                         await ExecuteKeyword();
+                        return;
+
+                    case "misc":
+                        await ExecuteMisc();
                         return;
 
                     case "config":
@@ -209,6 +214,31 @@ namespace wowwowwow
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"A command was specified with a missing option.{pointerToHelpText}"));
             }
 
+        }
+
+        private async Task ExecuteMisc()
+        {
+            try 
+            {
+                switch (currentCommand.split[2])
+                {
+                    case "count":
+                        await miscCommands.Count();
+                        return;
+
+                    case "pfp":
+                        await miscCommands.Pfp(currentCommand.message.MentionedUsers, currentCommand.message.Author);
+                        return;
+
+                    default:
+                        await verboseManager.SendEmbedMessage(embedMessage.Error($"\nNo such command.{pointerToHelpText}"));
+                        return;
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
+            }
         }
 
         private async Task ExecuteConfig()
