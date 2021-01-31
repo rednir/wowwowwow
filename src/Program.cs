@@ -20,7 +20,6 @@ namespace wowwowwow
 
         public const string deleteReactionText = "\uD83D\uDDD1\uFE0F";
 
-        public static bool isBotPaused = false;
 
         private DataManager dataManager = new DataManager();
         private Dictionary<IGuild, CommandManager> instancesOfCommandManager = new Dictionary<IGuild, CommandManager>();
@@ -56,111 +55,32 @@ namespace wowwowwow
             await Task.Delay(-1);
         }
 
-
-        private async Task Ready()
-        {
-            await _client.SetGameAsync("!wow help", null, ActivityType.Playing);
-        }
-
-
-        private async Task ReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
-        {
-            var message = await cachedMessage.GetOrDownloadAsync();
-            if (message.Author.Id == botAccountID && reaction.UserId != botAccountID && reaction.Emote.Name == deleteReactionText)
-            {
-                Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"ReactionAdded (Delete by: {reaction.User} / {reaction.UserId})").ToString());
-                await message.DeleteAsync();
-            }
-        }
-
         private async Task MessageRecieved(SocketMessage recievedMessage)
         {
-            Console.WriteLine($"[{recievedMessage.Timestamp}] {recievedMessage.Author}: {recievedMessage.Content}");
-            if (isBotPaused || DataManager.config["ignore"].Contains(recievedMessage.Author.Id))
-            {
-                return;
-            }
-
-            if (recievedMessage.Content.StartsWith(CommandManager.commandIdentifier))
-            {
-                VerboseManager.lastChannel = recievedMessage.Channel;
-                await CommandRecieved(recievedMessage);
-                return;
-            }
-
-            // only carry on if message is not command
-            // todo: make this seperate method
-            var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
-            if (foundKeywords is null)
-            {
-                return;
-            }
-
-            VerboseManager.lastChannel = recievedMessage.Channel;
-            Console.WriteLine($"changed last channel to = {recievedMessage.Channel}");
-            if (DataManager.keywords[foundKeywords].StartsWith("http"))
-            {
-                await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords], true));
-                return;
-            }
-
-            await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords]));
-        }
-
-        private async Task CommandRecieved(SocketMessage command)
-        {
-            if (command.Content == CommandManager.commandIdentifier)
-            {
-                await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
-                return;
-            }
-
-            IGuild guildOfMessage = (command.Channel as SocketGuildChannel).Guild;
+            IGuild guildOfMessage = (recievedMessage.Channel as SocketGuildChannel).Guild;
             if (!instancesOfCommandManager.ContainsKey(guildOfMessage))
             {
                 // create a new instance for a new guild
                 instancesOfCommandManager.Add(guildOfMessage, new CommandManager());
             }
-            await instancesOfCommandManager[guildOfMessage].Execute(command);
+            await instancesOfCommandManager[guildOfMessage].MessageRecieved(recievedMessage);
+        }
+
+        private async Task ReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            IGuild guildOfReaction = (channel as SocketGuildChannel).Guild;
+            if (!instancesOfCommandManager.ContainsKey(guildOfReaction))
+            {
+                // create a new instance for a new guild
+                instancesOfCommandManager.Add(guildOfReaction, new CommandManager());
+            }
+            await instancesOfCommandManager[guildOfReaction].ReactionAdded(cachedMessage, channel, reaction);
         }
 
 
-        // todo: rewrite
-        private dynamic CheckStringForKeyword(string s)
+        private async Task Ready()
         {
-
-            List<string> listOfKeywords = new List<string>();
-            string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
-            stringToSearch = new StringBuilder(stringToSearch).Append(" ").Insert(0, " ").ToString();  // this is used to stop errors occuring when checking whether the keyword found is part of another word
-
-            foreach (var k in DataManager.keywords.Keys)
-            {
-                string keyword = k.ToLower();
-                if (stringToSearch.Contains(keyword))
-                {
-                    // prioritize exact matches
-                    if (keyword == stringToSearch)
-                    {
-                        listOfKeywords.Add(keyword);
-                        listOfKeywords.RemoveAll((x) => x != keyword);
-                        return listOfKeywords.Max();
-
-                    }
-                    else if (stringToSearch.Contains(keyword))
-                    {
-                        // check if the keyword found is not part of another word (check if whitespace in front and behind)
-                        if (char.IsWhiteSpace(stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length]) && char.IsWhiteSpace(stringToSearch[stringToSearch.IndexOf(keyword) - 1]))
-                        {
-                            listOfKeywords.Add(keyword);
-                        }
-                    }
-                    
-                }
-
-            }
-
-            return listOfKeywords.Max();
-
+            await _client.SetGameAsync("!wow help", null, ActivityType.Playing);
         }
 
 

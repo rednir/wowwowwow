@@ -64,17 +64,16 @@ namespace wowwowwow.UserCommands
             await verboseManager.SendEmbedMessage(embedMessage.Log(command, LogSeverity.Info, $"[{this.ToString()}]"));
         }
 
-        public async Task Pause(double minutes)
+        public async Task<double> Pause(double minutes)
         {
             if (minutes > 999 || minutes <= 0)
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error("The number of minutes specified was either too big or too small"));
-                return;
+                return 0;
             }
-            Program.isBotPaused = true;
+
             await verboseManager.SendEmbedMessage(embedMessage.Info($"Bot has been paused for {minutes} minutes"));
-            await Task.Delay(Convert.ToInt32(minutes * 60000.0));
-            Program.isBotPaused = false;
+            return minutes * 60000.0;
         }
 
     }

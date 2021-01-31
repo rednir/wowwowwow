@@ -15,13 +15,13 @@ namespace wowwowwow.UserCommands
     {
         public async Task Count()
         {
-            
+            await verboseManager.SendEmbedMessage(embedMessage.GenericResponse("Counting has been started in this channel. I'll start:\n\n**1**", false, false));
         }
 
         public async Task Pfp(IEnumerable<SocketUser> usersMentioned, SocketUser requestBy)
         {
             SocketUser user;
-            
+
             if (usersMentioned.Count() == 0)
             {
                 user = requestBy;

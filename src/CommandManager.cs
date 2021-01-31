@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Globalization;
+using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
@@ -24,6 +26,14 @@ namespace wowwowwow
             public List<string> parameters { get; set; }
         }
 
+        private class Counting
+        {
+            public SocketChannel currentCountingChannel;
+            public SocketUser lastUser = Program._client.GetUser(Program.botAccountID);
+            public int lastNumber = 1;
+        }
+        private Counting counting;
+        public static bool isBotPaused = false;
 
         private UserCommands.Main mainCommands = new UserCommands.Main();
         private UserCommands.Voice voiceCommands = new UserCommands.Voice();
@@ -115,7 +125,8 @@ namespace wowwowwow
                     return;
 
                 case "pause":
-                    await mainCommands.Pause(Convert.ToDouble(currentCommand.split[2]));
+                    double pauseTime = await mainCommands.Pause(Convert.ToDouble(currentCommand.split[2]));
+                    await Task.Delay(Convert.ToInt32(pauseTime));
                     return;
 
                 default:
@@ -224,6 +235,8 @@ namespace wowwowwow
                 {
                     case "count":
                         await miscCommands.Count();
+                        counting = new Counting();
+                        counting.currentCountingChannel = (currentCommand.message.Channel as SocketChannel);
                         return;
 
                     case "pfp":
@@ -273,6 +286,121 @@ namespace wowwowwow
             {
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
             }
+
+        }
+
+
+        public async Task ReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            var message = await cachedMessage.GetOrDownloadAsync();
+            if (message.Author.Id == Program.botAccountID && reaction.UserId != Program.botAccountID && reaction.Emote.Name == Program.deleteReactionText)
+            {
+                Console.WriteLine(new LogMessage(LogSeverity.Info, "wowwowwow", $"ReactionAdded (Delete by: {reaction.User} / {reaction.UserId})").ToString());
+                await message.DeleteAsync();
+            }
+        }
+
+        public async Task MessageRecieved(SocketMessage recievedMessage)
+        {
+            Console.WriteLine($"[{recievedMessage.Timestamp}] {recievedMessage.Author}: {recievedMessage.Content}");
+            if (isBotPaused || DataManager.config["ignore"].Contains(recievedMessage.Author.Id))
+            {
+                return;
+            }
+
+            if (recievedMessage.Content.StartsWith(CommandManager.commandIdentifier))
+            {
+                VerboseManager.lastChannel = recievedMessage.Channel;
+                await CommandRecieved(recievedMessage);
+                return;
+            }
+            else if (counting != null)
+            {
+                int userNumber;
+                if (int.TryParse(recievedMessage.Content, out userNumber) && counting.lastUser != recievedMessage.Author && counting.currentCountingChannel == recievedMessage.Channel)
+                {
+                    counting.lastUser = recievedMessage.Author;
+                    if (userNumber == counting.lastNumber + 1)
+                    {
+                        await recievedMessage.AddReactionAsync(new Emoji("✅"));
+                        counting.lastNumber += 1;
+                    }
+                    else
+                    {
+                        await recievedMessage.AddReactionAsync(new Emoji("❎"));
+                        await verboseManager.SendEmbedMessage(embedMessage.GenericResponse($"Clearly {recievedMessage.Author.Username} doesn't know how to count...\nType `!wow misc count` to try again.", false, false));
+                        counting = null;
+                    }
+                }
+
+            }
+
+            // only carry on if message is not command
+            // todo: make this seperate method
+            var foundKeywords = CheckStringForKeyword(recievedMessage.Content);
+            if (foundKeywords is null)
+            {
+                return;
+            }
+
+            VerboseManager.lastChannel = recievedMessage.Channel;
+            Console.WriteLine($"changed last channel to = {recievedMessage.Channel}");
+            if (DataManager.keywords[foundKeywords].StartsWith("http"))
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords], true));
+                return;
+            }
+
+            await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords]));
+        }
+
+        private async Task CommandRecieved(SocketMessage command)
+        {
+            if (command.Content == CommandManager.commandIdentifier)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Info(CommandManager.pointerToHelpText));
+                return;
+            }
+            
+            await Execute(command);
+        }
+
+
+        // todo: rewrite
+        private dynamic CheckStringForKeyword(string s)
+        {
+
+            List<string> listOfKeywords = new List<string>();
+            string stringToSearch = s.ToLower().Trim('!', '.', '\"', '?', '\'', '#', ',', ':', '*', '-');
+            stringToSearch = new StringBuilder(stringToSearch).Append(" ").Insert(0, " ").ToString();  // this is used to stop errors occuring when checking whether the keyword found is part of another word
+
+            foreach (var k in DataManager.keywords.Keys)
+            {
+                string keyword = k.ToLower();
+                if (stringToSearch.Contains(keyword))
+                {
+                    // prioritize exact matches
+                    if (keyword == stringToSearch)
+                    {
+                        listOfKeywords.Add(keyword);
+                        listOfKeywords.RemoveAll((x) => x != keyword);
+                        return listOfKeywords.Max();
+
+                    }
+                    else if (stringToSearch.Contains(keyword))
+                    {
+                        // check if the keyword found is not part of another word (check if whitespace in front and behind)
+                        if (char.IsWhiteSpace(stringToSearch[stringToSearch.IndexOf(keyword) + keyword.Length]) && char.IsWhiteSpace(stringToSearch[stringToSearch.IndexOf(keyword) - 1]))
+                        {
+                            listOfKeywords.Add(keyword);
+                        }
+                    }
+                    
+                }
+
+            }
+
+            return listOfKeywords.Max();
 
         }
 
