@@ -33,7 +33,7 @@ namespace wowwowwow
             public int lastNumber = 1;
         }
         private Counting counting;
-        public static bool isBotPaused = false;
+        public bool isBotPaused = false;
 
         private UserCommands.Main mainCommands = new UserCommands.Main();
         private UserCommands.Voice voiceCommands = new UserCommands.Voice();
@@ -126,7 +126,9 @@ namespace wowwowwow
 
                 case "pause":
                     double pauseTime = await mainCommands.Pause(Convert.ToDouble(currentCommand.split[2]));
-                    await Task.Delay(Convert.ToInt32(pauseTime));
+                    isBotPaused = true;
+                    
+                    _ = Task.Delay(Convert.ToInt32(pauseTime)).ContinueWith((a) => isBotPaused = false);
                     return;
 
                 default:
@@ -305,6 +307,7 @@ namespace wowwowwow
             Console.WriteLine($"[{recievedMessage.Timestamp}] {recievedMessage.Author}: {recievedMessage.Content}");
             if (isBotPaused || DataManager.config["ignore"].Contains(recievedMessage.Author.Id))
             {
+                Console.WriteLine(isBotPaused);
                 return;
             }
 
