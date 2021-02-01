@@ -130,9 +130,9 @@ namespace wowwowwow
             {
                 return new EmbedMessage() { title = "", description = toBeDescription, color = Color.Default, timeUntilDelete = 15000, logSeverity = toBeLogSeverity, logSource = toBeLogSource };
             }
-            public EmbedMessage GenericResponse(string toBeDescription, bool isToBeImage = false, bool isToBeDeleteOption = true, string toBeTitle = "")
+            public EmbedMessage GenericResponse(string toBeDescription, bool isToBeImage = false, bool isToBeDeleteOption = false, string toBeTitle = "", string toBeUrl = "")
             {
-                return new EmbedMessage() { title = toBeTitle, description = toBeDescription, color = Color.LightGrey, isImage = isToBeImage, isThereDeleteOption = isToBeDeleteOption };
+                return new EmbedMessage() { title = toBeTitle, description = toBeDescription, color = Color.LightGrey, isImage = isToBeImage, isThereDeleteOption = isToBeDeleteOption, url = toBeUrl };
             }
             public EmbedMessage NowPlaying(string toBeAuthor, string toBeTitle, string toBeUrl, string toBeDescription, string toBeFooter, string toBeImage = "")
             {

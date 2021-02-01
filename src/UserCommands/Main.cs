@@ -29,10 +29,8 @@ namespace wowwowwow.UserCommands
             " - `!wow keyword edit \"<keyword>\" \"<optional:image> <value>\"`",
 
             "\nGeometry Dash Commands: (todo)",
-            " - `!wow gd search <user/level> <search>`",
-            " - `!wow gd daily`",
-            " - `!wow gd weekly`",
-            " - `!wow gd top10`",
+            " - `!wow gd search daily/weekly/<search>`",
+            " - `!wow gd pointercrate`",
 
             "\nMisc commands",
             " - `!wow misc count`",

@@ -38,6 +38,7 @@ namespace wowwowwow
         private UserCommands.Main mainCommands = new UserCommands.Main();
         private UserCommands.Voice voiceCommands = new UserCommands.Voice();
         private UserCommands.Keyword keywordCommands = new UserCommands.Keyword();
+        private UserCommands.GeometryDash geometryDashCommands = new UserCommands.GeometryDash();
         private UserCommands.Misc miscCommands = new UserCommands.Misc();
         private UserCommands.Config configCommands = new UserCommands.Config();
 
@@ -85,6 +86,10 @@ namespace wowwowwow
 
                     case "keyword":
                         await ExecuteKeyword();
+                        return;
+
+                    case "gd":
+                        await ExecuteGeometryDash();
                         return;
 
                     case "misc":
@@ -229,6 +234,33 @@ namespace wowwowwow
 
         }
 
+        private async Task ExecuteGeometryDash()
+        {
+
+            try
+            {
+                switch (currentCommand.split[2])
+                {
+                    case "search":
+                        await geometryDashCommands.Search(currentCommand.parameters.Count > 0 ? currentCommand.parameters[0] : currentCommand.split[3]);
+                        return;
+                    
+                    case "pointercrate":
+                        await geometryDashCommands.Pointercrate();
+                        return;
+                        
+                    default:
+                        await verboseManager.SendEmbedMessage(embedMessage.Error($"\nNo such command.\n{pointerToHelpText}"));
+                        return;
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
+            }
+
+        }
+
         private async Task ExecuteMisc()
         {
             try 
@@ -307,7 +339,6 @@ namespace wowwowwow
             Console.WriteLine($"[{recievedMessage.Timestamp}] {recievedMessage.Author}: {recievedMessage.Content}");
             if (isBotPaused || DataManager.config["ignore"].Contains(recievedMessage.Author.Id))
             {
-                Console.WriteLine(isBotPaused);
                 return;
             }
 
@@ -319,6 +350,7 @@ namespace wowwowwow
             }
             else if (counting != null)
             {
+                // todo: make all this seperate method
                 int userNumber;
                 if (int.TryParse(recievedMessage.Content, out userNumber) && counting.lastUser != recievedMessage.Author && counting.currentCountingChannel == recievedMessage.Channel)
                 {
@@ -350,11 +382,11 @@ namespace wowwowwow
             Console.WriteLine($"changed last channel to = {recievedMessage.Channel}");
             if (DataManager.keywords[foundKeywords].StartsWith("http"))
             {
-                await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords], true));
+                await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords], true, true));
                 return;
             }
 
-            await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords]));
+            await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(DataManager.keywords[foundKeywords], false, true));
         }
 
         private async Task CommandRecieved(SocketMessage command)
