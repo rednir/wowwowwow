@@ -19,7 +19,7 @@ namespace wowwowwow.UserCommands
 {
     public class GeometryDash : UserCommands
     {
-
+        //private static string script = "import sys\nimport gd\n\nclient = gd.Client()\n\n\nasync def Main():\n    args = ''\n\n    for a in sys.argv[1:]:\n        if a == sys.argv[len(sys.argv) - 1]:\n            args += a\n        else:\n            args += a + ' '\n\n    # command: search\n    if args.startswith('Daily'):\n        await daily()\n    elif args.startswith('Weekly'):\n        await weekly()\n    elif args.startswith('SEARCH_TERM'):\n        await search(args[len('SEARCH_TERM') + 1:])\n\n\nasync def print_level_data(level):\n    print(level.id)\n    print(level.name)\n    print(level.creator)\n    print(level.difficulty)\n    print(level.stars)\n    print(level.downloads)\n    print(level.rating)\n\n\n\n#####    MAIN FUNCTIONS    ####\n\nasync def search(term):\n    found_levels = await client.search_levels_on_page(0, term)\n    found_levels = found_levels[:3]\n    print(len(found_levels))\n    for i in range(len(found_levels)):\n        await print_level_data(found_levels[i])\n\n\nasync def daily():\n    current_daily = await client.get_daily()\n    print(1)\n    await print_level_data(current_daily)\n\n\nasync def weekly():\n    current_weekly = await client.get_weekly()\n    print(1)\n    await print_level_data(current_weekly)\n\n\n\n####    CODE START   ####\n\n\ntry:\n    client.run(Main())\nexcept gd.errors.MissingAccess:\n    print('NO_LEVELS')\n";
         private HttpClient httpclient = new HttpClient() { BaseAddress = new Uri("https://pointercrate.com") };
 
         private class LevelData
@@ -135,7 +135,8 @@ namespace wowwowwow.UserCommands
             string[] outputLines;
             ProcessStartInfo start = new ProcessStartInfo();
             start.FileName = "python";
-            start.Arguments = $"src/UserCommands/PythonScripts/GeometryDash.py {args}";
+            start.Arguments = $"src/GeometryDashScripts.py {args}";
+            //start.Arguments = $"{args} -c {script}";
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             using (Process process = Process.Start(start))

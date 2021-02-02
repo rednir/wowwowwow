@@ -5,21 +5,21 @@ client = gd.Client()
 
 
 async def Main():
-    args = ""
+    args = ''
 
     for a in sys.argv[1:]:
         if a == sys.argv[len(sys.argv) - 1]:
             args += a
         else:
-            args += a + " "
+            args += a + ' '
 
     # command: search
-    if args.startswith("Daily"):
+    if args.startswith('Daily'):
         await daily()
-    elif args.startswith("Weekly"):
+    elif args.startswith('Weekly'):
         await weekly()
-    elif args.startswith("SEARCH_TERM"):
-        await search(args[len("SEARCH_TERM") + 1:])
+    elif args.startswith('SEARCH_TERM'):
+        await search(args[len('SEARCH_TERM') + 1:])
 
 
 async def print_level_data(level):
@@ -62,4 +62,4 @@ async def weekly():
 try:
     client.run(Main())
 except gd.errors.MissingAccess:
-    print("NO_LEVELS")
+    print('NO_LEVELS')
