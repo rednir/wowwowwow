@@ -59,5 +59,7 @@ async def weekly():
 ####    CODE START   ####
 
 
-
-client.run(Main())
+try:
+    client.run(Main())
+except gd.errors.MissingAccess:
+    print("NO_LEVELS")

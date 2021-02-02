@@ -174,9 +174,15 @@ namespace wowwowwow.UserCommands
             }
 
             string[] output = await RunScript(arg);
-            List<LevelData> listOfLevelData = ParseLevelData(output);
+            if (output[0] == "NO_LEVELS")
+            {
+                await downloadingMessage.DeleteAsync();
+                await verboseManager.SendEmbedMessage(embedMessage.Warning("No levels were found. Try a different search term."));
+                return;
+            }
 
             await downloadingMessage.DeleteAsync();
+            List<LevelData> listOfLevelData = ParseLevelData(output);
             foreach (LevelData levelData in listOfLevelData)
             {
                 await verboseManager.SendEmbedMessage(embedMessage.GenericResponse(LevelDataToString(levelData), false, false, resultMessageTitle, $"https://gdbrowser.com/{levelData.id}"));
