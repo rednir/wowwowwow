@@ -39,6 +39,7 @@ namespace wowwowwow
         private UserCommands.Voice voiceCommands = new UserCommands.Voice();
         private UserCommands.Keyword keywordCommands = new UserCommands.Keyword();
         private UserCommands.GeometryDash geometryDashCommands = new UserCommands.GeometryDash();
+        private UserCommands.Osu osuCommands = new UserCommands.Osu();
         private UserCommands.Misc miscCommands = new UserCommands.Misc();
         private UserCommands.Config configCommands = new UserCommands.Config();
 
@@ -90,6 +91,10 @@ namespace wowwowwow
 
                     case "gd":
                         await ExecuteGeometryDash();
+                        return;
+
+                    case "osu":
+                        await ExecuteOsu();
                         return;
 
                     case "misc":
@@ -259,6 +264,31 @@ namespace wowwowwow
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
             }
 
+        }
+
+        private async Task ExecuteOsu()
+        {
+            try
+            {
+                switch (currentCommand.split[2])
+                {
+                    case "user":
+                        await osuCommands.User(currentCommand.split[3]);
+                        return;
+
+                    case "beatmap":
+                        await osuCommands.Beatmap(currentCommand.split[3]);
+                        return;
+                        
+                    default:
+                        await verboseManager.SendEmbedMessage(embedMessage.Error($"\nNo such command.\n{pointerToHelpText}"));
+                        return;
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
+            }
         }
 
         private async Task ExecuteMisc()
