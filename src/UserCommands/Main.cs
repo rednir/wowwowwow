@@ -28,9 +28,13 @@ namespace wowwowwow.UserCommands
             " - `!wow keyword remove \"<keyword>\"`",
             " - `!wow keyword edit \"<keyword>\" \"<optional:image> <value>\"`",
 
-            "\nGeometry Dash Commands: (todo)",
+            "\nGeometry Dash Commands:",
             " - `!wow gd search daily/weekly/<search>`",
             " - `!wow gd pointercrate`",
+
+            "\nosu! Commands:",
+            " - `!wow osu user <username/id>`",
+            " - `!wow osu score <id>`",
 
             "\nMisc commands",
             " - `!wow misc count`",
@@ -40,7 +44,7 @@ namespace wowwowwow.UserCommands
             " - `!wow config ignore <user> <true/false>`",
             " - `!wow config react_to_delete <true/false>`",
             " - `!wow config quiet_mode <true/false>` (todo)",
-            " - `!wow config reset <config/keywords/all>`",
+            " - `!wow config reset <config/keywords/all>` (todo)",
 
             "\nTODO: welcome text, different datamanager for different guilds, hardcoded perms with refresh, pause "
         });
