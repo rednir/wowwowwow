@@ -45,7 +45,7 @@ namespace wowwowwow.UserCommands
                 public double pp { get; set; }
                 public double hit_accuracy { get; set; }
                 public int play_time { get; set; }
-                public Dictionary<string, int> rank { get; set; }       // key: global/country
+                public Dictionary<string, object> rank { get; set; }       // key: global/country
                 public GradeCounts grade_counts { get; set; }
                 public class GradeCounts
                 {
@@ -84,9 +84,10 @@ namespace wowwowwow.UserCommands
 
         private VerboseManager.EmbedMessage ParseUserDataIntoMessage(UserData userData, UserScores[] userScores)
         {
+            string rank = userData.statistics.rank["global"] is null ? "(unranked)" : $"#{userData.statistics.rank["global"]}";
             string isOnline = Convert.ToBoolean(userData.is_online) ? "🟢" : "🔴";
             string isSupporter = Convert.ToBoolean(userData.is_supporter) ? "*(osu!supporter)*" : "";
-            return embedMessage.GenericResponse($"{userData.cover_url} Performance: {userData.statistics.pp}pp\nAccuracy: {Math.Round(userData.statistics.hit_accuracy, 2)}%\nPlay Time: {userData.statistics.play_time / 3600}h\n\n{rankingIcons["ss"]}: {userData.statistics.grade_counts.ss} | {rankingIcons["ssh"]}: {userData.statistics.grade_counts.ssh} | {rankingIcons["s"]}: {userData.statistics.grade_counts.s} | {rankingIcons["sh"]}: {userData.statistics.grade_counts.sh} | {rankingIcons["a"]}: {userData.statistics.grade_counts.a}\n\nTop Play: https://osu.ppy.sh/scores/{userData.playmode}/{userScores[0].id}", true, false, $"{isOnline} **{userData.username}** {isSupporter}  |  #{userData.statistics.rank["global"]}", $"https://osu.ppy.sh/u/{userData.username}", $"Playing since: {DateTime.Parse(userData.join_date)}");
+            return embedMessage.GenericResponse($"{userData.cover_url} Performance: {userData.statistics.pp}pp\nAccuracy: {Math.Round(userData.statistics.hit_accuracy, 2)}%\nPlay Time: {userData.statistics.play_time / 3600}h\n\n{rankingIcons["ss"]}: {userData.statistics.grade_counts.ss} | {rankingIcons["ssh"]}: {userData.statistics.grade_counts.ssh} | {rankingIcons["s"]}: {userData.statistics.grade_counts.s} | {rankingIcons["sh"]}: {userData.statistics.grade_counts.sh} | {rankingIcons["a"]}: {userData.statistics.grade_counts.a}\n\nTop Play: https://osu.ppy.sh/scores/{userData.playmode}/{userScores[0].id}", true, false, $"{isOnline} **{userData.username}** {isSupporter}  |  {rank}", $"https://osu.ppy.sh/u/{userData.username}", $"Playing since: {DateTime.Parse(userData.join_date)}");
         }
 
         public async Task User(string user)
