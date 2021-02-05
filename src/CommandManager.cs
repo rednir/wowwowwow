@@ -39,6 +39,7 @@ namespace wowwowwow
         private UserCommands.Voice voiceCommands = new UserCommands.Voice();
         private UserCommands.Keyword keywordCommands = new UserCommands.Keyword();
         private UserCommands.GeometryDash geometryDashCommands = new UserCommands.GeometryDash();
+        private UserCommands.Trn trnCommands = new UserCommands.Trn();
         private UserCommands.Osu osuCommands = new UserCommands.Osu();
         private UserCommands.Misc miscCommands = new UserCommands.Misc();
         private UserCommands.Config configCommands = new UserCommands.Config();
@@ -82,7 +83,7 @@ namespace wowwowwow
                 switch (currentCommand.split[1])
                 {
                     case "vc":
-                        _ = ExecuteVoice();
+                        _ = ExecuteVoice();     // dont wait for this
                         return;
 
                     case "keyword":
@@ -91,6 +92,10 @@ namespace wowwowwow
 
                     case "gd":
                         await ExecuteGeometryDash();
+                        return;
+
+                    case "trn":
+                        await ExecuteTrn();
                         return;
 
                     case "osu":
@@ -264,6 +269,35 @@ namespace wowwowwow
                 await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
             }
 
+        }
+
+        private async Task ExecuteTrn()
+        {
+            try
+            {
+                switch (currentCommand.split[2])
+                {
+                    case "csgo":
+                        await trnCommands.Csgo(currentCommand.split[3]);
+                        return;
+
+                    case "apex":
+                        await trnCommands.Apex(currentCommand.split[3]);
+                        return;
+                        
+                    case "overwatch":
+                        await trnCommands.Overwatch(currentCommand.split[3]);
+                        return;
+                        
+                    default:
+                        await verboseManager.SendEmbedMessage(embedMessage.Error($"\nNo such command.\n{pointerToHelpText}"));
+                        return;
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                await verboseManager.SendEmbedMessage(embedMessage.Error($"\nA command was specified with a missing option.{pointerToHelpText}"));
+            }
         }
 
         private async Task ExecuteOsu()

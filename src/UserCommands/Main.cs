@@ -32,9 +32,14 @@ namespace wowwowwow.UserCommands
             " - `!wow gd search daily/weekly/<search>`",
             " - `!wow gd pointercrate`",
 
+            "\nTRN commands:",
+            " - `!wow trn csgo <steam_identifier>`",
+            " - `!wow trn apex <origin_identifier>`",
+            " - `!wow trn overwatch <battlenet_identifier>`",
+
             "\nosu! Commands:",
             " - `!wow osu user <username/id>`",
-            " - `!wow osu score <id>`",
+            " - `!wow osu score <id> (todo)`",
 
             "\nMisc commands",
             " - `!wow misc count`",
