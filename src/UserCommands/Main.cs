@@ -44,6 +44,7 @@ namespace wowwowwow.UserCommands
             "\nMisc commands",
             " - `!wow misc count`",
             " - `!wow misc pfp`",
+            " - `!wow misc pepega <text>`",
 
             "\nConfiguration Commands:",
             " - `!wow config ignore <user> <true/false>`",
