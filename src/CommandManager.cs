@@ -341,6 +341,10 @@ namespace wowwowwow
                         await miscCommands.Pfp(currentCommand.message.MentionedUsers, currentCommand.message.Author);
                         return;
 
+                    case "ruin":
+                        await miscCommands.Pepega(currentCommand.parameters[0]);
+                        return;
+
                     default:
                         await verboseManager.SendEmbedMessage(embedMessage.Error($"\nNo such command.{pointerToHelpText}"));
                         return;
