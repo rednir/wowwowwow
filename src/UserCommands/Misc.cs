@@ -43,6 +43,8 @@ namespace wowwowwow.UserCommands
 
         public async Task Pepega(string text)
         {
+            RestUserMessage downloadingMessage = await verboseManager.SendEmbedMessage(embedMessage.Progress("Please wait..."));
+
             Random random = new Random();
             List<string> randomlySortedLanguages = pepegaLanguages.OrderBy(x => random.Next()).ToList(); 
             randomlySortedLanguages.Add("en");  // always finally translate back to english
@@ -59,6 +61,8 @@ namespace wowwowwow.UserCommands
                 Dictionary<string, string> translatedText = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
                 text = translatedText["translatedText"];
             }
+
+            await downloadingMessage.DeleteAsync();
             await verboseManager.SendEmbedMessage(embedMessage.GenericResponse($"{Emote.Parse("<:Pepega:695943070281105460>")} 📢 {text}"));
         }
 
