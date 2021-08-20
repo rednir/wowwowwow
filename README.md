@@ -1,4 +1,6 @@
 # wowwowwow
-Simple discord bot using the Discord.NET library
+First attempt at making a Discord bot. Look through the code if you dare.
 
-https://discord.com/oauth2/authorize?client_id=802277381129764865&permissions=8&scope=bot
+Precursor to https://github.com/rednir/wow2
+
+<!---https://discord.com/oauth2/authorize?client_id=802277381129764865&permissions=8&scope=bot-->
